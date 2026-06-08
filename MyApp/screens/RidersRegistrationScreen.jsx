@@ -62,7 +62,7 @@ export default function RidersRegistrationScreen({ navigation }) {
           />
 
           {/* Enter Button */}
-          <TouchableOpacity style={s.primaryBtn} onPress={() => {}}>
+          <TouchableOpacity style={s.primaryBtn} onPress={() => navigation.navigate('DriversRegistration')}>
             <Text style={s.primaryBtnText}>Enter</Text>
           </TouchableOpacity>
 

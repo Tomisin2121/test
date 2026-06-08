@@ -21,6 +21,7 @@ export default function VerificationScreen({ navigation }) {
   };
 
   const handleKeyPress = (e, index) => {
+    // Go back on backspace if box is empty
     if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
       inputs[index - 1].current.focus();
     }
@@ -49,6 +50,7 @@ export default function VerificationScreen({ navigation }) {
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 keyboardType="number-pad"
                 maxLength={1}
+                textAlign="center"
               />
             ))}
           </View>
@@ -68,7 +70,7 @@ export default function VerificationScreen({ navigation }) {
           {/* Resend */}
           <View style={s.resendRow}>
             <Text style={s.resendText}>I didn't receive the code? </Text>
-            <TouchableOpacity onPress={() => {/* TODO: resend code logic */}}>
+            <TouchableOpacity>
               <Text style={s.linkText}>Send again</Text>
             </TouchableOpacity>
           </View>

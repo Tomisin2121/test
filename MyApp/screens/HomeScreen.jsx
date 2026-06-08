@@ -193,7 +193,7 @@ export default function HomeScreen({ navigation }) {
     <Text style={s.tabLabel}>Napep</Text>
   </TouchableOpacity>
 
-  <TouchableOpacity style={s.tab} onPress={() => navigation.navigate('Login')}>
+  <TouchableOpacity style={s.tab} onPress={() => navigation.navigate('MyProfile')}>
     <Text style={s.tabIcon}>👤</Text>
     <Text style={s.tabLabel}>Account</Text>
   </TouchableOpacity>

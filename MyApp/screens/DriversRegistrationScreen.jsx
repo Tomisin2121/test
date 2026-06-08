@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, KeyboardAvoidingView, Platform,
+  StyleSheet, ScrollView, KeyboardAvoidingView,
+  Platform, Modal,
 } from 'react-native';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 
@@ -16,12 +17,13 @@ const AXES = [
 ];
 
 export default function DriversRegistrationScreen({ navigation }) {
-  const [fullName,    setFullName]    = useState('');
-  const [phone,       setPhone]       = useState('');
-  const [license,     setLicense]     = useState('');
-  const [tricycleReg, setTricycleReg] = useState('');
-  const [makeModel,   setMakeModel]   = useState('');
+  const [fullName,     setFullName]     = useState('');
+  const [phone,        setPhone]        = useState('');
+  const [license,      setLicense]      = useState('');
+  const [tricycleReg,  setTricycleReg]  = useState('');
+  const [makeModel,    setMakeModel]    = useState('');
   const [selectedAxes, setSelectedAxes] = useState([]);
+  const [savedModal,   setSavedModal]   = useState(false);
 
   const toggleAxis = (id) => {
     setSelectedAxes(prev =>
@@ -30,7 +32,17 @@ export default function DriversRegistrationScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
-    navigation.navigate('RegistrationSuccess');
+    setSavedModal(true); // show the saved modal
+  };
+
+  const handleTransitPayment = () => {
+    setSavedModal(false);
+    navigation.navigate('DriverPayment');
+  };
+
+  const handleDone = () => {
+    setSavedModal(false);
+    navigation.navigate('Home');
   };
 
   return (
@@ -53,7 +65,7 @@ export default function DriversRegistrationScreen({ navigation }) {
             <View style={s.uploadCircle}>
               <Text style={s.uploadIcon}>+</Text>
             </View>
-            <Text style={s.profilePicLabel}>Profile Picture</Text>
+            <Text style={s.profilePicLabel}>Update Picture</Text>
           </TouchableOpacity>
 
           {/* Full Name */}
@@ -132,6 +144,44 @@ export default function DriversRegistrationScreen({ navigation }) {
 
         </View>
       </ScrollView>
+
+      {/* ── Saved Modal ── */}
+      <Modal
+        visible={savedModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSavedModal(false)}
+      >
+        <View style={s.modalBackdrop}>
+          <View style={s.modalCard}>
+
+            {/* Badge checkmark */}
+            <View style={s.badgeOuter}>
+              <View style={s.badgeInner}>
+                <Text style={s.badgeCheck}>✓</Text>
+              </View>
+            </View>
+
+            {/* Saved text */}
+            <Text style={s.savedText}>Saved</Text>
+
+            {/* Transit Payment button */}
+            <TouchableOpacity
+              style={s.transitBtn}
+              onPress={() => navigation?.navigate('DriverPayment')}
+            >
+              <Text style={s.transitBtnText}>Transit payment</Text>
+            </TouchableOpacity>
+
+            {/* Done link */}
+            <TouchableOpacity onPress={handleDone}>
+              <Text style={s.doneText}>Done</Text>
+            </TouchableOpacity>
+
+          </View>
+        </View>
+      </Modal>
+
     </KeyboardAvoidingView>
   );
 }
@@ -153,12 +203,17 @@ const s = StyleSheet.create({
     gap: Spacing.sm,
   },
   headerIcon:  { fontSize: 22 },
-  headerTitle: { color: Colors.white, fontSize: FontSize.md, fontWeight: '900', letterSpacing: 1.5 },
+  headerTitle: {
+    color: Colors.white,
+    fontSize: FontSize.md,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
 
   form: { padding: Spacing.md },
 
   // Profile Pic
-  profilePicBox: { alignItems: 'center', marginBottom: Spacing.md },
+  profilePicBox:   { alignItems: 'center', marginBottom: Spacing.md },
   uploadCircle: {
     width: 72,
     height: 72,
@@ -171,8 +226,8 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing.xs,
   },
-  uploadIcon:       { fontSize: 28, color: Colors.textMuted },
-  profilePicLabel:  { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '600' },
+  uploadIcon:      { fontSize: 28, color: Colors.textMuted },
+  profilePicLabel: { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '600' },
 
   input: {
     backgroundColor: Colors.inputBg,
@@ -186,8 +241,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
 
-  vehicleRow:    { flexDirection: 'row', gap: Spacing.sm },
-  vehicleInput:  { flex: 1 },
+  vehicleRow:   { flexDirection: 'row', gap: Spacing.sm },
+  vehicleInput: { flex: 1 },
   vehicleImageBtn: {
     flex: 1,
     backgroundColor: Colors.inputBg,
@@ -198,6 +253,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing.sm,
     gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
   },
   vehicleImageText: { fontSize: FontSize.xs, color: Colors.textMuted, fontWeight: '600' },
   vehicleImageIcon: { fontSize: 18 },
@@ -228,10 +284,7 @@ const s = StyleSheet.create({
     alignItems: 'flex-start',
     gap: Spacing.xs,
   },
-  axisBoxSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#E8F5E9',
-  },
+  axisBoxSelected: { borderColor: Colors.primary, backgroundColor: '#E8F5E9' },
   checkbox: {
     width: 18,
     height: 18,
@@ -253,5 +306,95 @@ const s = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.sm,
   },
-  submitBtnText: { color: Colors.white, fontSize: FontSize.md, fontWeight: '700', letterSpacing: 1 },
+  submitBtnText: {
+    color: Colors.white,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+
+  // ── Modal ──
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.xl,
+  },
+  modalCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+
+  // Badge (gear/shield shape using nested circles)
+  badgeOuter: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+    // Octagon-like effect with border
+    borderWidth: 6,
+    borderColor: '#2D6A4F',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  badgeInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  badgeCheck: {
+    color: Colors.white,
+    fontSize: 32,
+    fontWeight: '900',
+  },
+
+  savedText: {
+    fontSize: FontSize.xl,
+    fontWeight: '900',
+    color: Colors.text,
+    marginBottom: Spacing.lg,
+    letterSpacing: 0.5,
+  },
+
+  transitBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.md - 2,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: Spacing.md,
+  },
+  transitBtnText: {
+    color: Colors.white,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+
+  doneText: {
+    fontSize: FontSize.md,
+    color: Colors.link,
+    fontWeight: '600',
+  },
 });

@@ -21,7 +21,7 @@ export default function NewPasswordScreen({ navigation }) {
       return;
     }
     setError('');
-    navigation?.navigate('Login');
+    navigation?.navigate('PasswordChanged');
   };
 
   return (

@@ -18,7 +18,14 @@ export default function SignUpScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
 
-        
+        {/* ── Brand Header ── */}
+        <View style={s.header}>
+          <View style={s.logoCircle}>
+            {/* Replace with your actual logo: <Image source={require('../assets/logo.png')} style={s.logo} /> */}
+            <Text style={s.logoText}>RCT</Text>
+          </View>
+          <Text style={s.brandName}>REDEMPTION{'\n'}CITY TRANSIT</Text>
+        </View>
 
         {/* ── Card ── */}
         <View style={s.card}>
@@ -52,7 +59,7 @@ export default function SignUpScreen({ navigation }) {
               value={email}
               onChangeText={setEmail}
             />
-            <TouchableOpacity style={s.forgotInline} onPress={() => navigation?.navigate('ForgotPassword')}>
+            <TouchableOpacity style={s.forgotInline}>
               <Text style={s.forgotText}>Forgot password?</Text>
             </TouchableOpacity>
           </View>
