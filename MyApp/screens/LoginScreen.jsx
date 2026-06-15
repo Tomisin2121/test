@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  ScrollView, KeyboardAvoidingView, Platform,
+  ScrollView, KeyboardAvoidingView, Platform, Image
 } from 'react-native';
 import { s } from './LoginScreen.style';
 
@@ -17,7 +17,7 @@ export default function LoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
 
-        <View style={s.card}>
+        <View>
           <Text style={s.title}>Login</Text>
 
           {/* Email */}
@@ -63,12 +63,17 @@ export default function LoginScreen({ navigation }) {
 
           {/* Social Buttons */}
           <TouchableOpacity style={s.socialFullBtn}>
-            <Text style={s.googleG}>G</Text>
+            <Image
+                source={require('../assets/google.png')}
+                     style={s.google} />
             <Text style={s.socialFullBtnText}>Continue with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={s.socialFullBtn}>
-            <Text style={s.socialFullBtnText}>🍎  Continue with iOS</Text>
+            <Image
+                                  source={require('../assets/apple.png')}
+                                  style={s.apple} />
+            <Text style={s.socialFullBtnText}>Continue with iOS</Text>
           </TouchableOpacity>
 
           {/* Sign Up Link */}

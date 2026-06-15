@@ -22,17 +22,21 @@ export const s = StyleSheet.create({
   },
 
   title: {
-    fontSize: FontSize.xl,
+    fontSize: 30,
     fontWeight: '800',
     color: Colors.text,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xxl,
+    marginTop: -175,
+    textAlign: 'center'
   },
 
   label: {
-    fontSize: FontSize.sm,
-    color: Colors.text,
+    fontSize: 20,
+    color: '#8E9496',
     fontWeight: '600',
     marginBottom: Spacing.xs,
+    marginTop: 30,
+    textAlign:'center'
   },
 
   input: {
@@ -45,19 +49,21 @@ export const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.inputBorder,
     marginBottom: Spacing.sm,
+    marginTop: 20
   },
 
   backRow: {
     flexDirection: 'row',
     alignSelf: 'center',
     marginBottom: Spacing.md,
+    marginTop: 20
   },
   backText: {
-    fontSize: FontSize.sm,
+    fontSize: 15,
     color: Colors.textMuted,
   },
   linkText: {
-    fontSize: FontSize.sm,
+    fontSize: 15,
     color: Colors.link,
     fontWeight: '700',
   },
@@ -67,7 +73,7 @@ export const s = StyleSheet.create({
     borderRadius: Radius.xl,
     paddingVertical: Spacing.md - 2,
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom:0,
   },
   primaryBtnText: {
     color: Colors.white,
@@ -95,7 +101,7 @@ export const s = StyleSheet.create({
   socialRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: Spacing.md,
+    gap: Spacing.xl,
     marginBottom: Spacing.lg,
   },
   socialBtn: {

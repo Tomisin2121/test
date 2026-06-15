@@ -10,44 +10,40 @@ export const s = StyleSheet.create({
     padding: Spacing.md,
   },
 
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
+  
 
   title: {
-    fontSize: FontSize.xxl,
+    fontSize: 50,
     fontWeight: '800',
     color: Colors.text,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xxl,
+    marginTop: -95,
+    textAlign: 'center'
   },
 
   input: {
-    backgroundColor: Colors.inputBg,
+    backgroundColor: '#D4D3D3',
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: 10,
     fontSize: FontSize.md,
     color: Colors.text,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: Colors.inputBorder,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xl,
+    gap:1
   },
 
   forgotBtn: {
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     marginBottom: Spacing.md,
+      textAlign: 'center'
   },
   forgotText: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
-    fontWeight: '500',
+    fontSize: FontSize.lg,
+    color: '#8E9496',
+    fontWeight: '600',
+  
   },
 
   primaryBtn: {
@@ -83,14 +79,15 @@ export const s = StyleSheet.create({
   socialFullBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderWidth: 0.5,
     borderColor: Colors.inputBorder,
     borderRadius: Radius.md,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: Spacing.sm,
     marginBottom: Spacing.sm,
-    gap: Spacing.sm,
-    backgroundColor: Colors.white,
+
+    backgroundColor: '#D4D3D3',
   },
   googleG: {
     fontSize: FontSize.md,
@@ -98,9 +95,11 @@ export const s = StyleSheet.create({
     color: '#EA4335',
   },
   socialFullBtnText: {
-    fontSize: FontSize.sm,
+    fontSize: 16,
     color: Colors.text,
     fontWeight: '600',
+    marginLeft:35,
+    flex: 1
   },
 
   bottomRow: {
@@ -117,4 +116,15 @@ export const s = StyleSheet.create({
     color: Colors.link,
     fontWeight: '700',
   },
+  apple: {
+    width: 40,
+    height: 40,
+    
+  },
+  google:{
+    height: 40,
+    width: 40,
+   
+    
+  }
 });

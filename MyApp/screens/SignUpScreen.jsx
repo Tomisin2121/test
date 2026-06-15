@@ -19,17 +19,11 @@ export default function SignUpScreen({ navigation }) {
       <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
 
         {/* ── Brand Header ── */}
-        <View style={s.header}>
-          <View style={s.logoCircle}>
-            {/* Replace with your actual logo: <Image source={require('../assets/logo.png')} style={s.logo} /> */}
-            <Text style={s.logoText}>RCT</Text>
-          </View>
-          <Text style={s.brandName}>REDEMPTION{'\n'}CITY TRANSIT</Text>
-        </View>
+       
 
         {/* ── Card ── */}
         <View style={s.card}>
-          <Text style={s.title}>SIGN UP</Text>
+          <Text style={s.headerTitle}>SIGN UP</Text>
           <Text style={s.subtitle}>Enter your number</Text>
 
           {/* Phone */}
@@ -89,13 +83,19 @@ export default function SignUpScreen({ navigation }) {
           {/* Social Buttons */}
           <View style={s.socialRow}>
             <TouchableOpacity style={s.socialBtn}>
-              <Text style={s.socialIcon}>G</Text>
+              <Image
+                      source={require('../assets/google.png')}
+                      style={s.google} />
             </TouchableOpacity>
             <TouchableOpacity style={s.socialBtn}>
-              <Text style={s.socialIcon}>🍎</Text>
+              <Image
+                      source={require('../assets/apple.png')}
+                      style={s.apple} />
             </TouchableOpacity>
             <TouchableOpacity style={[s.socialBtn, s.facebookBtn]}>
-              <Text style={[s.socialIcon, { color: '#fff' }]}>f</Text>
+              <Image
+                      source={require('../assets/facebook.png')}
+                      style={s.facebook} />
             </TouchableOpacity>
           </View>
 
@@ -106,15 +106,15 @@ export default function SignUpScreen({ navigation }) {
               <Text style={s.linkText}>Log in</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Legal */}
-          <Text style={s.legal}>
+<Text style={s.legalText}>
             By signing up, you agree to our Terms & Conditions and confirm that
             you are 18+ years old. We may send you promotions related to our services.
           </Text>
-        </View>
-
+          </View>
       </ScrollView>
+          {/* Legal */}
+      
     </KeyboardAvoidingView>
   );
 }
+s

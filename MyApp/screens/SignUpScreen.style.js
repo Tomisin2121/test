@@ -3,11 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 
 export const s = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: Colors.primary,
-    paddingBottom: Spacing.xxl,
-  },
+ 
 
   // ── Header ──
   header: {
@@ -47,31 +43,37 @@ export const s = StyleSheet.create({
   },
 
   // ── Card ──
-  card: {
-    backgroundColor: Colors.white,
-    marginHorizontal: Spacing.md,
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  title: {
-    fontSize: FontSize.xl,
-    fontWeight: '900',
-    color: Colors.text,
-    textAlign: 'center',
-    letterSpacing: 2,
-    marginBottom: Spacing.xs,
-  },
+ container: {
+  flexGrow: 1,
+  backgroundColor: '#076007', // your green — swap for your theme color
+},
+
+card: {
+  flex: 1,
+  backgroundColor: '#fff',
+  borderBottomLeftRadius: 60,
+  borderBottomRightRadius: 60,
+  paddingHorizontal: 24,
+  padding: 72,
+  marginBottom:200,// controls how much green shows at the top
+},
+  
   subtitle: {
     fontSize: FontSize.sm,
     color: Colors.textMuted,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
+  headerTitle: {
+  color: '#111',
+  fontSize: 32,
+  fontWeight: 'bold',
+  letterSpacing: 2,
+  textAlign: 'center',
+  paddingTop: 25,
+  paddingBottom: 24,
+
+},
 
   // ── Phone Row ──
   phoneRow: {
@@ -173,8 +175,9 @@ export const s = StyleSheet.create({
   socialRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: Spacing.md,
+    gap: Spacing.xl,
     marginBottom: Spacing.md,
+    marginTop: Spacing.md
   },
   socialBtn: {
     width: 48,
@@ -212,11 +215,28 @@ export const s = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // ── Legal ──
-  legal: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
+ bottom: {
+  paddingHorizontal: 24,
+  paddingBottom: 20,
+  paddingTop: 12,
+
+},
+legalText: {
+  color: '#000',
+  fontSize: 11,
+  textAlign: 'center',
+  opacity: 0.5,
+},
+facebook: {
+  width: 65,
+  height: 65
+},
+apple: {
+  width: 65,
+  height: 65,
+},
+google: {
+  width: 65,
+  height: 65
+}
 });

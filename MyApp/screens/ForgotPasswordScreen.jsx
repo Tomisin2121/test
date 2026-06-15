@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  ScrollView, KeyboardAvoidingView, Platform,
+  ScrollView, KeyboardAvoidingView, Platform,Image
 } from 'react-native';
 import { s } from './ForgotPasswordScreen.style';
 
@@ -16,7 +16,7 @@ export default function ForgotPasswordScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
 
-        <View style={s.card}>
+        <View>
           <Text style={s.title}>Forgot password</Text>
 
           <Text style={s.label}>Enter Email Address</Text>
@@ -58,13 +58,19 @@ export default function ForgotPasswordScreen({ navigation }) {
           {/* Social Icons */}
           <View style={s.socialRow}>
             <TouchableOpacity style={s.socialBtn}>
-              <Text style={s.googleG}>G</Text>
+              <Image
+                                source={require('../assets/google.png')}
+                                style={s.google} />
             </TouchableOpacity>
             <TouchableOpacity style={s.socialBtn}>
-              <Text style={s.socialIcon}>🍎</Text>
+           <Image
+                                 source={require('../assets/apple.png')}
+                                 style={s.apple} />
             </TouchableOpacity>
             <TouchableOpacity style={[s.socialBtn, s.facebookBtn]}>
-              <Text style={[s.socialIcon, { color: '#fff' }]}>f</Text>
+              <Image
+                                   source={require('../assets/facebook.png')}
+                                   style={s.facebook} />
             </TouchableOpacity>
           </View>
 
