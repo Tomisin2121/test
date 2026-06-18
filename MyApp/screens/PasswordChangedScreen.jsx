@@ -1,6 +1,6 @@
 // screens/PasswordChangedScreen.jsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 
 export default function PasswordChangedScreen({ navigation }) {
@@ -8,12 +8,9 @@ export default function PasswordChangedScreen({ navigation }) {
     <View style={s.container}>
       <View style={s.card}>
 
-        {/* Green badge checkmark */}
-        <View style={s.badgeOuter}>
-          <View style={s.badgeInner}>
-            <Text style={s.badgeCheck}>✓</Text>
-          </View>
-        </View>
+        <Image
+                              source={require('../assets/verified icon 1 (1).png')}
+                              style={s.facebook} />
 
         {/* Text */}
         <Text style={s.title}>Password Changed</Text>
@@ -33,56 +30,30 @@ export default function PasswordChangedScreen({ navigation }) {
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: Spacing.lg,
+    backgroundColor: '#B8B0B0',
+    
+   
+   
   },
 
   card: {
     backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    padding: Spacing.xxl,
+    borderTopRightRadius: 50,
+    borderTopLeftRadius: 50,
+   padding: Spacing.xxl,
     width: '100%',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16,
-    elevation: 10,
+    marginTop: 200,
+    marginBottom: 100,
+    height: 600
+  
   },
 
   // Badge — gear/seal shape using layered circles
-  badgeOuter: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.lg,
-    // Outer ring
-    borderWidth: 8,
-    borderColor: '#2D6A4F',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 8,
-    // Notched seal effect
-    transform: [{ rotate: '22.5deg' }],
-  },
-  badgeInner: {
-    transform: [{ rotate: '-22.5deg' }], // counter-rotate content to stay upright
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeCheck: {
-    color: Colors.white,
-    fontSize: 52,
-    fontWeight: '900',
-    lineHeight: 60,
-  },
 
   title: {
     fontSize: FontSize.xl,
@@ -98,7 +69,7 @@ const s = StyleSheet.create({
     fontWeight: '500',
   },
   homeLink: {
-    color: Colors.link,
+    color: '#0D82E2',
     fontWeight: '700',
   },
 });

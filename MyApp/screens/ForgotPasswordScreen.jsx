@@ -47,16 +47,11 @@ export default function ForgotPasswordScreen({ navigation }) {
           >
             <Text style={s.primaryBtnText}>Send</Text>
           </TouchableOpacity>
-
-          {/* Divider */}
-          <View style={s.dividerRow}>
-            <View style={s.dividerLine} />
-            <Text style={s.dividerText}>or</Text>
-            <View style={s.dividerLine} />
-          </View>
-
+          
           {/* Social Icons */}
+          <Text style={s.ore}>Or</Text>
           <View style={s.socialRow}>
+            
             <TouchableOpacity style={s.socialBtn}>
               <Image
                                 source={require('../assets/google.png')}
@@ -75,6 +70,7 @@ export default function ForgotPasswordScreen({ navigation }) {
           </View>
 
           {/* Sign up link */}
+          <Text style= {s.orea}>Did you have an account?</Text>
           <TouchableOpacity
             style={s.signUpBtn}
             onPress={() => navigation?.navigate('SignUp')}

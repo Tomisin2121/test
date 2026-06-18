@@ -26,7 +26,7 @@ export const s = StyleSheet.create({
     fontWeight: '800',
     color: Colors.text,
     marginBottom: Spacing.xxl,
-    marginTop: -175,
+    marginTop: -95,
     textAlign: 'center'
   },
 
@@ -38,7 +38,10 @@ export const s = StyleSheet.create({
     marginTop: 30,
     textAlign:'center'
   },
-
+  ore:{
+    textAlign: 'center',
+    paddingTop: 12,
+  },
   input: {
     backgroundColor: Colors.inputBg,
     borderRadius: Radius.md,
@@ -74,6 +77,7 @@ export const s = StyleSheet.create({
     paddingVertical: Spacing.md - 2,
     alignItems: 'center',
     marginBottom:0,
+    marginTop: 25,
   },
   primaryBtnText: {
     color: Colors.white,
@@ -82,27 +86,13 @@ export const s = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-    gap: Spacing.sm,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.divider,
-  },
-  dividerText: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-  },
 
   socialRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: Spacing.xl,
     marginBottom: Spacing.lg,
+    marginTop: 50,
   },
   socialBtn: {
     width: 48,
@@ -135,6 +125,7 @@ export const s = StyleSheet.create({
     borderRadius: Radius.xl,
     paddingVertical: Spacing.sm + 2,
     alignItems: 'center',
+    marginTop: 10,
   },
   signUpText: {
     fontSize: FontSize.md,
@@ -149,4 +140,19 @@ export const s = StyleSheet.create({
     color: Colors.link,
     fontWeight: '600',
   },
+  apple: {
+    width: 52,
+    height: 54,
+  },
+  google: {
+    width: 52,
+    height: 54,
+  },
+  facebook: {
+    width: 52,
+    height: 54,
+  },
+  orea:{
+    textAlign:'center'
+  }
 });

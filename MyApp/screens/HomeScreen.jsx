@@ -1,426 +1,422 @@
-// screens/HomeScreen.jsx
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity,
-  ScrollView, StyleSheet, Modal, Animated,
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+  StyleSheet,
+  StatusBar,
+  FlatList,
+  Dimensions,
+  Platform,
 } from 'react-native';
-import { Colors, FontSize, Radius, Spacing } from '../theme';
-import MapView, { Marker } from 'react-native-maps';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ─── Mock Data ───────────────────────────────────────────────────────────────
 
 const ROUTES = [
-  { id: '1', from: 'Car pack B', to: 'Car Pack C Gate', eta: '11mins', color: Colors.primary },
-  { id: '2', from: 'Car pack B', to: 'River Jordan',    eta: '17mins', color: Colors.secondary },
+  {
+    id: '1',
+    eta: '19mins',
+    distance: '1.0km',
+    origin: 'Car pack B, opposite prayer foyer Back of old auditorium...',
+    destination: 'Car pack C gate, to lagos Ibadan expressway',
+  },
+  {
+    id: '2',
+    eta: '17mins',
+    distance: '1.3km',
+    origin: 'Car pack B, opposite prayer foyer Back of old auditorium...',
+    destination: 'Lotto, to lagos Ibadan through Tree of life, Missionary host...',
+  },
+  {
+    id: '3',
+    eta: '25mins',
+    distance: '1.6km',
+    origin: 'Car pack C, Lagos Ibadan expressway',
+    destination: 'New auditorium shimawa through Car B tree of life gate...',
+  },
+  {
+    id: '4',
+    eta: '25mins',
+    distance: '1.6km',
+    origin: 'Car pack F, serving point Moses apart road',
+    destination: 'New auditorium shimawa through car p...',
+  },
 ];
 
-const EVENTS = [
-  { id: '1', title: 'METO',                subtitle: 'holy ghost convention',    date: 'Jun 2025' },
-  { id: '2', title: 'Divine\nFaithfulness', subtitle: 'Theme: Divine Faithfulness', date: 'Jun 2025' },
-  { id: '3', title: 'HOT\nCHOS\nFESTIVAL', subtitle: 'Lagos ghost festival',      date: 'Jun 2025' },
+const EVENT_BANNERS = [
+  {
+    id: '1',
+    image: require('../assets/mega_festival.png'),
+    title: 'Mega Festival',
+  },
+  {
+    id: '2',
+    image: require('../assets/divine_faithfulness.png'),
+    title: 'Divine Faithfulness',
+  },
+  {
+    id: '3',
+    image: require('../assets/Holy_Ghost.png'),
+    title: 'Holy Ghost',
+  },
 ];
 
-export default function HomeScreen({ navigation }) {
-  const [search,      setSearch]      = useState('');
-  const [menuVisible, setMenuVisible] = useState(false);
+const TABS = [
+  { name: 'Home',    screen: 'Home',      icon: 'home-outline',          activeIcon: 'home' },
+  { name: 'Routing', screen:'RouteMap',   icon: 'git-branch-outline',    activeIcon: 'git-branch' },
+  { name: 'Napep',   screen:'NearestNapep',icon: 'car-sport-outline',     activeIcon: 'car-sport' },
+  { name: 'Account', screen:'MyProfile',   icon: 'person-circle-outline', activeIcon: 'person-circle' },
+];
 
-  const closeMenu = () => setMenuVisible(false);
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+/**
+ * Aerial/satellite map strip at the top.
+ * Swap `source` for a real MapView or Google Maps Static tile in production.
+ */
+const MapHeader = () => (
+  <ImageBackground
+    source={require('../assets/map_aerial.png')}
+    style={styles.mapHeader}
+    resizeMode="cover"
+  >
+    <SafeAreaView edges={['top']} style={styles.mapHeaderSafe} />
+  </ImageBackground>
+);
+
+/** Single route card */
+const RouteCard = ({ route }) => (
+  <TouchableOpacity activeOpacity={0.75} style={styles.routeCard}>
+    {/* Top row: ETA left | car icon + distance right */}
+    <View style={styles.routeCardTop}>
+      <Text style={styles.etaText}>
+        <Text style={styles.etaLabel}>ETA </Text>
+        {route.eta}
+      </Text>
+      <View style={styles.routeCardTopRight}>
+        <FontAwesome5 name="car-side" size={20} color="#555" style={{ marginRight: 6 }} />
+        <Text style={styles.distanceText}>{route.distance}</Text>
+      </View>
+    </View>
+
+    {/* Hairline divider */}
+    <View style={styles.routeCardDivider} />
+
+    {/* Origin — red pin */}
+    <View style={styles.routeStop}>
+      <Ionicons name="location-sharp" size={14} color="#E53935" style={styles.stopIcon} />
+      <Text style={styles.stopText} numberOfLines={1}>
+        {route.origin}
+      </Text>
+    </View>
+
+    {/* Destination — green pin */}
+    <View style={styles.routeStop}>
+      <Ionicons name="location-sharp" size={14} color="#43A047" style={styles.stopIcon} />
+      <Text style={styles.stopText} numberOfLines={1}>
+        {route.destination}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+/** "Take a look" horizontal event banner strip */
+const EventBannerStrip = () => (
+  <View style={styles.takeLookSection}>
+    <Text style={styles.takeLookTitle}>TAKE A LOOK</Text>
+    <FlatList
+      data={EVENT_BANNERS}
+      keyExtractor={(item) => item.id}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.bannerList}
+      ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
+      renderItem={({ item }) => (
+        <TouchableOpacity activeOpacity={0.8} style={styles.bannerCard}>
+          <Image source={item.image} style={styles.bannerImage} resizeMode="cover" />
+        </TouchableOpacity>
+      )}
+    />
+  </View>
+);
+
+/** Bottom tab bar */
+const BottomTabBar = ({ activeTab, onPress, navigation }) => (
+  <View style={styles.tabBar}>
+    {TABS.map((tab) => {
+      const isActive = tab.name === activeTab;
+      return (
+        <TouchableOpacity
+          key={tab.name}
+          style={styles.tabItem}
+          activeOpacity={0.7}
+          onPress={() => {
+            onPress(tab.name);
+            navigation.navigate(tab.screen);
+          }}
+        >
+          <Ionicons
+            name={isActive ? tab.activeIcon : tab.icon}
+            size={22}
+            color={isActive ? DARK_RED : '#888'}
+          />
+          <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+            {tab.name}
+          </Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+);
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
+
+const HomeScreen = ({navigation}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('Home');
+
+  const filteredRoutes = ROUTES.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r.origin.toLowerCase().includes(q) ||
+      r.destination.toLowerCase().includes(q)
+    );
+  });
 
   return (
-    <View style={s.container}>
+    <View style={styles.root}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      {/* ── Top Header Bar ── */}
-      <View style={s.header}>
-        {/* Hamburger */}
-        <TouchableOpacity
-          style={s.hamburger}
-          onPress={() => setMenuVisible(true)}
-        >
-          <View style={s.bar} />
-          <View style={s.bar} />
-          <View style={s.bar} />
-        </TouchableOpacity>
+      {/* Aerial map header strip */}
+      <MapHeader />
 
-        <Text style={s.headerTitle}>City Transit</Text>
-
-        {/* Logout */}
-        <TouchableOpacity onPress={() => navigation.navigate('Landing')}>
-          <Text style={s.logoutText}>Log out</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* ── Hamburger Menu Modal ── */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeMenu}
-      >
-        {/* Backdrop — tap to close */}
-        <TouchableOpacity style={s.backdrop} onPress={closeMenu} activeOpacity={1}>
-
-          {/* Nav Drawer — stops tap from closing */}
-          <TouchableOpacity style={s.drawer} activeOpacity={1}>
-            <Text style={s.drawerTitle}>Menu</Text>
-
-            {/* Nav Items — horizontal row */}
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={s.navRow}>
-
-                <TouchableOpacity
-                  style={s.navItem}
-                  onPress={() => { closeMenu(); }}
-                >
-                  <Text style={s.navLabel}>Home</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={s.navItem}
-                  onPress={() => { closeMenu(); navigation.navigate('RouteMap'); }}
-                >
-                 
-                  <Text style={s.navLabel}>Routing</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={s.navItem}
-                  onPress={() => { closeMenu(); navigation.navigate('NearestNapep'); }}
-                >
-                 
-                  <Text style={s.navLabel}>Napep</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={s.navItem}
-                  onPress={() => { closeMenu(); navigation.navigate('Login'); }}
-                >
-                
-                  <Text style={s.navLabel}>Account</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[s.navItem, s.navItemLogout]}
-                  onPress={() => { closeMenu(); navigation.navigate('Landing'); }}
-                >
-                 
-                  <Text style={[s.navLabel, { color: Colors.secondary }]}>Log out</Text>
-                </TouchableOpacity>
-
-              </View>
-            </ScrollView>
-          </TouchableOpacity>
-
-        </TouchableOpacity>
-      </Modal>
-
-      {/* ── Main Content ── */}
-      <ScrollView showsVerticalScrollIndicator={false}>
-
-        {/* Search */}
-        <View style={s.searchRow}>
-          <Text style={s.searchIcon}>🔍</Text>
+      {/* Body */}
+      <View style={styles.body}>
+        {/* Search bar */}
+        <View style={styles.searchWrapper}>
+          <Ionicons name="search" size={16} color="#999" style={styles.searchIcon} />
           <TextInput
-            style={s.searchInput}
+            style={styles.searchInput}
             placeholder="Route ?"
-            placeholderTextColor="#999"
-            value={search}
-            onChangeText={setSearch}
+            placeholderTextColor="#aaa"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
           />
         </View>
 
-        {/* Route Cards */}
-        {ROUTES.map((route) => (
-          <TouchableOpacity
-            key={route.id}
-            style={[s.routeCard, { backgroundColor: route.color }]}
-            onPress={() => navigation.navigate('RouteMap')}
-          >
-            <View>
-              <Text style={s.routeText}>{route.from} → {route.to}</Text>
-              <Text style={s.etaText}>ETA {route.eta}</Text>
-            </View>
-            <Text style={s.carIcon}>🚗</Text>
-          </TouchableOpacity>
-        ))}
-
-        {/* Take a Tour */}
-        <TouchableOpacity style={s.tourBtn}>
-          <Text style={s.tourIcon}>📍</Text>
-          <Text style={s.tourText}>Take a tour</Text>
-        </TouchableOpacity>
-
-        {/* Events */}
-        <Text style={s.sectionTitle}>Take a look</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.eventsRow}>
-          {EVENTS.map((ev) => (
-            <View key={ev.id} style={s.eventCard}>
-              <Text style={s.eventTitle}>{ev.title}</Text>
-              <Text style={s.eventSub}>{ev.subtitle}</Text>
-              <Text style={s.eventDate}>{ev.date}</Text>
-            </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {filteredRoutes.map((route) => (
+            <RouteCard key={route.id} route={route} />
           ))}
+
+          <EventBannerStrip />
+
+          {/* Extra breathing room above tab bar */}
+          <View style={{ height: 16 }} />
         </ScrollView>
-<MapView
-  style={s.map}
-  initialRegion={{
-    latitude: 6.7500,       // RCCG Redemption Camp coordinates
-    longitude: 3.5000,
-    latitudeDelta: 0.01,    // zoom level
-    longitudeDelta: 0.01,
-  }}
->
-  <Marker
-    coordinate={{ latitude: 6.7500, longitude: 3.5000 }}
-    title="RCCG Redemption Camp"
-    description="Redemption City Transit"
-  />
-</MapView>
-      </ScrollView>
-     
-<View style={s.bottomNav}>
+      </View>
 
-  <TouchableOpacity style={s.tab} onPress={() => {}}>
-    <Text style={s.tabIcon}>🏠</Text>
-    <Text style={[s.tabLabel, s.tabActive]}>Home</Text>
-    <View style={s.activeDot} />
-  </TouchableOpacity>
-
-  <TouchableOpacity style={s.tab} onPress={() => navigation.navigate('RouteMap')}>
-    <Text style={s.tabIcon}>🔄</Text>
-    <Text style={s.tabLabel}>Routing</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity style={s.tab} onPress={() => navigation.navigate('NearestNapep')}>
-    <Text style={s.tabIcon}>🛺</Text>
-    <Text style={s.tabLabel}>Napep</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity style={s.tab} onPress={() => navigation.navigate('MyProfile')}>
-    <Text style={s.tabIcon}>👤</Text>
-    <Text style={s.tabLabel}>Account</Text>
-  </TouchableOpacity>
-
-</View>
+      <BottomTabBar activeTab={activeTab} onPress={setActiveTab} navigation={navigation} />
     </View>
   );
-}
+};
 
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+export default HomeScreen;
 
-  // ── Header ──
-  header: {
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const DARK_RED = '#8B1A1A';
+const CARD_RADIUS = 10;
+const CARD_SHADOW = Platform.select({
+  ios: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  android: { elevation: 2 },
+});
+
+const styles = StyleSheet.create({
+  // ── Root ──
+  root: {
+    flex: 1,
+    backgroundColor: '#F2F2F2',
+  },
+
+  // ── Map header ──
+  mapHeader: {
+    width: '100%',
+    height: 120,
+  },
+  mapHeaderSafe: {
+    flex: 1,
+  },
+
+  // ── Body ──
+  body: {
+    flex: 1,
+    backgroundColor: '#F2F2F2',
+  },
+
+  // ── Search bar ──
+  searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    marginHorizontal: 14,
+    marginTop: 12,
+    marginBottom: 10,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'ios' ? 10 : 6,
+    ...CARD_SHADOW,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    padding: 0,
+    margin: 0,
+  },
+
+  // ── Scroll content ──
+  scrollContent: {
+    paddingHorizontal: 14,
+    paddingBottom: 8,
+  },
+
+  // ── Route card ──
+  routeCard: {
+    backgroundColor: '#fff',
+    borderRadius: CARD_RADIUS,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 10,
+    ...CARD_SHADOW,
+  },
+  routeCardTop: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg + 8,
-    paddingBottom: Spacing.md,
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  headerTitle: {
-    color: Colors.white,
-    fontSize: FontSize.lg,
-    fontWeight: '800',
-    letterSpacing: 1,
+  routeCardTopRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  logoutText: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: FontSize.sm,
+  etaText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#222',
+  },
+  etaLabel: {
+    fontWeight: '400',
+    color: '#555',
+  },
+  distanceText: {
+    fontSize: 13,
+    color: '#555',
     fontWeight: '600',
   },
-
-  // ── Hamburger ──
-  hamburger: {
-    padding: Spacing.xs,
-    gap: 1,
-    justifyContent: 'center',
+  routeCardDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#E0E0E0',
+    marginBottom: 8,
   },
-  bar: {
-    width: 24,
-    height: 2,
-    backgroundColor: Colors.white,
-    borderRadius: 2,
-    marginVertical: 2,
+  routeStop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
   },
-
-  // ── Modal Backdrop ──
-  backdrop: {
+  stopIcon: {
+    marginTop: 1,
+    marginRight: 6,
+  },
+  stopText: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-start',
+    fontSize: 12,
+    color: '#444',
+    lineHeight: 17,
   },
 
-  // ── Drawer ──
-drawer: {
-  backgroundColor: Colors.white,
-  paddingTop: Spacing.lg,
-  paddingBottom: Spacing.lg,
-  paddingHorizontal: Spacing.md,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.2,
-  shadowRadius: 8,
-  elevation: 8,
-  width: 220,              // ← fixed width
-  alignSelf: 'flex-start', // ← stick to left side
-},
-  drawerTitle: {
-    fontSize: FontSize.sm,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    marginBottom: Spacing.md,
-    letterSpacing: 1,
+  // ── Take a look ──
+  takeLookSection: {
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  takeLookTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    color: '#222',
+    marginBottom: 10,
     textTransform: 'uppercase',
   },
-
-  // ── Nav Row (horizontal) ──
-  navRow: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: Spacing.xl,
+  bannerList: {
+    paddingRight: 4,
   },
- navItem: {
-  flexDirection: 'row',    // icon and label side by side
-  alignItems: 'center',
-  gap: Spacing.sm,         // space between icon and label
-},
-  navItemLogout: {
-    backgroundColor: '#FEE2E2',
+  bannerCard: {
+    width: (SCREEN_WIDTH - 14 * 2 - 10 * 2) / 3,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#ddd',
   },
-  navIcon:  { fontSize: 22, marginBottom: 4 },
-  navLabel: { fontSize: FontSize.xs, color: Colors.text, fontWeight: '600' },
-  map: {
-  height: 240,
-  
-  borderRadius: Radius.lg,
-  marginBottom: Spacing.xl,
-  overflow: 'hidden',
-},
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+  },
 
-  // ── Search ──
-  searchRow: {
+  // ── Bottom tab bar ──
+  tabBar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    marginHorizontal: Spacing.md,
-    marginTop: Spacing.md,
-    borderRadius: Radius.xl,
-    paddingHorizontal: Spacing.md,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: Spacing.sm,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    backgroundColor: '#D9D9D9',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E0E0E0',
+    paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+    paddingTop: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+      },
+      android: { elevation: 8 },
+    }),
   },
-  searchIcon:  { fontSize: 16, marginRight: Spacing.xs },
-  searchInput: { flex: 1, paddingVertical: Spacing.sm, fontSize: FontSize.md, color: Colors.text },
-
-  // ── Route Cards ──
-  routeCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderRadius: Radius.md,
-    padding: Spacing.md,
-  },
-  routeText: { color: Colors.white, fontSize: FontSize.sm, fontWeight: '700' },
-  etaText:   { color: 'rgba(255,255,255,0.8)', fontSize: FontSize.xs, marginTop: 2 },
-  carIcon:   { fontSize: 24 },
-
-  bottomNav: {
-  flexDirection: 'row',
-  backgroundColor: Colors.white,
-  borderTopWidth: 1,
-  borderTopColor: '#E5E5E5',
-  paddingVertical: Spacing.sm,
-  paddingBottom: Spacing.xxl,
-},
-tab: {
-  flex: 1,
-  alignItems: 'center',
-  gap: 3,
-},
-tabIcon: { fontSize: 22 },
-tabLabel: { fontSize: 10, color: Colors.textMuted, fontWeight: '500' },
-tabActive: { color: Colors.primary, fontWeight: '700' },
-activeDot: {
-  width: 4, height: 4,
-  borderRadius: 2,
-  backgroundColor: Colors.primary,
-  position: 'absolute',
-  top: 0,
-},
-  // ── Tour ──
-  tourBtn: {
-    flexDirection: 'row',
+  tabItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.accent,
-    marginHorizontal: Spacing.md,
-    borderRadius: Radius.xl,
-    paddingVertical: Spacing.sm + 2,
-    marginBottom: Spacing.md,
-    gap: Spacing.sm,
+    gap: 3,
   },
-  tourIcon: { fontSize: 16 },
-  tourText: { color: Colors.white, fontWeight: '700', fontSize: FontSize.sm },
-
-  // ── Events ──
-  sectionTitle: {
-    fontSize: FontSize.sm,
-    fontWeight: '700',
-    color: Colors.text,
-    marginHorizontal: Spacing.md,
-    marginBottom: Spacing.sm,
+  tabLabel: {
+    fontSize: 10,
+    color: '#888',
+    marginTop: 2,
   },
-  eventsRow:  { paddingLeft: Spacing.md, marginBottom: Spacing.md },
-  eventCard: {
-    width: 100,
-    height: 90,
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.md,
-    padding: Spacing.sm,
-    marginRight: Spacing.sm,
-    justifyContent: 'center',
+  tabLabelActive: {
+    color: DARK_RED,
+    fontWeight: '600',
   },
-  eventTitle: { color: Colors.white, fontSize: FontSize.xs, fontWeight: '900', lineHeight: 14 },
-  eventSub:   { color: 'rgba(255,255,255,0.7)', fontSize: 8, marginTop: 2 },
-  eventDate:  { color: 'rgba(255,255,255,0.6)', fontSize: 8, marginTop: 2 },
-
-  tabIconActive: {
-  tintColor: Colors.primary,  // for Image icons
-},
-tabLabelActive: {
-  color: Colors.primary,
-  fontWeight: '700',
-},
-  // ── Map ──
-  map: {
-  height: 180,             // reduce from current size
-  marginHorizontal: 16,
-  borderRadius: 16,
-  marginBottom: 24,
-  overflow: 'hidden',
-},
-eventCard: {
-  width: 110,              // slightly wider
-  height: 100,             // taller
-  backgroundColor: '#1B4332',
-  borderRadius: 12,
-  padding: 10,
-  marginRight: 10,
-  borderWidth: 1,
-  borderColor: 'rgba(255,255,255,0.1)',  // subtle border
-},
-
-  mapPlaceholder: {
-    marginHorizontal: Spacing.md,
-    height: 200,
-    backgroundColor: '#c8d6c8',
-    borderRadius: Radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xl,
-  },
-  mapText: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.primary },
-  mapSub:  { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 4 },
 });

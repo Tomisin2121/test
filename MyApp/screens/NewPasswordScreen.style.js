@@ -9,42 +9,32 @@ export const s = StyleSheet.create({
     justifyContent: 'center',
     padding: Spacing.md,
   },
-
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-
   title: {
     fontSize: FontSize.xxl,
     fontWeight: '800',
     color: Colors.text,
-    marginBottom: Spacing.lg,
+    marginBottom: 100,
+    marginTop: -200,
+    textAlign: 'center'
   },
 
   label: {
-    fontSize: FontSize.sm,
+    fontSize: 15,
     color: Colors.text,
-    fontWeight: '600',
-    marginBottom: Spacing.xs,
+    fontWeight: '900',
+    marginBottom: Spacing.lg,
   },
 
   input: {
     backgroundColor: Colors.inputBg,
-    borderRadius: Radius.md,
+    borderRadius: Radius.xl,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: 20,
     fontSize: FontSize.md,
     color: Colors.text,
     borderWidth: 1,
     borderColor: Colors.inputBorder,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.xl,
     letterSpacing: 2,
   },
 
@@ -71,7 +61,7 @@ export const s = StyleSheet.create({
 
   terms: {
     textAlign: 'center',
-    marginTop: Spacing.lg,
+    paddingTop:20,
     fontSize: FontSize.sm,
     color: Colors.link,
     fontWeight: '600',

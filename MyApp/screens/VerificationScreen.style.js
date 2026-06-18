@@ -6,71 +6,71 @@ export const s = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: Colors.background,
-    justifyContent: 'center',
-    padding: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.lg,
   },
 
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+  // ── Header ──
+  header: {
+    alignItems: 'center',
+    marginBottom: Spacing.xxxl,
+    marginTop: Spacing.lg,
   },
-
   title: {
-    fontSize: FontSize.xxl,
-    fontWeight: '800',
-    color: Colors.text,
-    marginBottom: Spacing.xs,
+    fontSize: 28,        // ~16px — small, not bold
+    fontWeight: '500',
+    color: '#474848',
+    textAlign: 'center',
   },
 
+  // ── Body ──
   subtitle: {
-    fontSize: FontSize.lg,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: Spacing.lg,
+    fontSize: 28,                 // large bold heading
+    fontWeight: '800',
+    color: '#1A1B1C',
+    marginBottom: Spacing.xl,
+    textAlign: 'center',
+    marginTop: -50
   },
 
   // ── Code Boxes ──
   codeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: Spacing.lg,
-    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+    gap: Spacing.md,              // slightly wider gap
   },
   codeBox: {
     flex: 1,
-    height: 56,
-    borderWidth: 2,
-    borderColor: Colors.inputBorder,
+    height: 64,                   // taller / squarish
+    borderWidth: 0,               // NO border by default
     borderRadius: Radius.md,
     fontSize: FontSize.xl,
     fontWeight: '700',
     color: Colors.text,
-    backgroundColor: Colors.inputBg,
+    backgroundColor: '#D9D9D9', // light gray fill
     textAlign: 'center',
   },
   codeBoxFilled: {
-    borderColor: Colors.primary,
+    borderWidth: 2,
+    borderColor: Colors.primary,  // border only when filled
     backgroundColor: Colors.white,
   },
 
   infoText: {
     fontSize: FontSize.sm,
     color: Colors.textMuted,
-    textAlign: 'center',
+    textAlign: 'left',            // left-aligned (not center)
     lineHeight: 20,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
 
+  // ── Verify Button ──
   primaryBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#0E280E',
     borderRadius: Radius.xl,
-    paddingVertical: Spacing.md - 2,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
     marginBottom: Spacing.md,
   },
@@ -78,29 +78,34 @@ export const s = StyleSheet.create({
     color: Colors.white,
     fontSize: FontSize.md,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
 
+  // ── Resend ──
   resendRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // left-aligned
     flexWrap: 'wrap',
+    marginTop: Spacing.xs,
   },
   resendText: {
-    fontSize: FontSize.sm,
+    fontSize: 16,
     color: Colors.textMuted,
   },
   linkText: {
-    fontSize: FontSize.sm,
-    color: Colors.link,
-    fontWeight: '700',
+    fontSize: 16,
+    color: '#0Dc2E2',
+    fontWeight: '600',
   },
 
+  // ── Terms ──
   terms: {
     textAlign: 'center',
-    marginTop: Spacing.lg,
-    fontSize: FontSize.sm,
-    color: Colors.link,
+    marginTop: 'auto',            // pushed to bottom
+    paddingTop: Spacing.xl,
+    fontSize: 18,
+    color: '#0Dc2E2',
     fontWeight: '600',
+    marginBottom: 80
   },
 });
