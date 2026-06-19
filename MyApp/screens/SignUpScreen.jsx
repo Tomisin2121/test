@@ -53,9 +53,7 @@ export default function SignUpScreen({ navigation }) {
               value={email}
               onChangeText={setEmail}
             />
-            <TouchableOpacity style={s.forgotInline}>
-              <Text style={s.forgotText}>Forgot password?</Text>
-            </TouchableOpacity>
+            
           </View>
 
           {/* Password */}

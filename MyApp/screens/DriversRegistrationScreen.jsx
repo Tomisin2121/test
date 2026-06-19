@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ScrollView, KeyboardAvoidingView,
-  Platform, Modal,Image
+  Platform, Modal,Image, Alert
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
+import { useDriver } from './context/DriverContext';
 
 const AXES = [
   { id: '1', label: 'Main Gate to old Arena' },
@@ -33,6 +36,14 @@ export default function DriversRegistrationScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
+    setDriverProfile(prev => ({
+    ...prev,
+    fullName,
+    phone,
+    license,
+    tricycleReg,
+    makeModel,
+  }));
     setSavedModal(true); // show the saved modal
   };
 
@@ -46,6 +57,57 @@ export default function DriversRegistrationScreen({ navigation }) {
     navigation.navigate('Home');
   };
 
+ const { driverProfile, setDriverProfile } = useDriver();
+const [profileImage, setProfileImage] = useState(null);
+
+const handleImagePick = () => {
+  Alert.alert(
+    'Profile Picture',
+    'Choose an option',
+    [
+      { text: 'Take Photo', onPress: openCamera },
+      { text: 'Choose from Gallery', onPress: openGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ]
+  );
+};
+
+const openCamera = async () => {
+  const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permission needed', 'Camera access is required.');
+    return;
+  }
+  const result = await ImagePicker.launchCameraAsync({
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 0.8,
+  });
+  if (!result.canceled) {
+    const uri = result.assets[0].uri;
+    setProfileImage(uri);                                        // ✅ updates circle on this screen
+    setDriverProfile(prev => ({ ...prev, profileImage: uri })); // ✅ saves to context for other screens
+  }
+};
+
+const openGallery = async () => {
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permission needed', 'Gallery access is required.');
+    return;
+  }
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 0.8,
+  });
+  if (!result.canceled) {
+    const uri = result.assets[0].uri;
+    setProfileImage(uri);                                        // ✅ updates circle on this screen
+    setDriverProfile(prev => ({ ...prev, profileImage: uri })); // ✅ saves to context for other screens
+  }
+};
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -69,14 +131,22 @@ export default function DriversRegistrationScreen({ navigation }) {
         <View style={s.form}>
 
           {/* Profile Picture */}
-          <TouchableOpacity style={s.profilePicBox}>
-            <View style={s.uploadCircle}>
-              <Text style={s.uploadIcon}>+</Text>
-              <Text style={s.uploadP}>Upload Image</Text>
-            </View>
-            <Text style={s.profilePicLabel}>Profile Picture</Text>
-          </TouchableOpacity>
-
+<TouchableOpacity style={s.profilePicBox} onPress={handleImagePick}>
+  <View style={s.uploadCircle}>
+    {profileImage ? (
+      <Image
+        source={{ uri: profileImage }}
+        style={s.profileImageFill}
+      />
+    ) : (
+      <>
+        <Text style={s.uploadIcon}>+</Text>
+        <Text style={s.uploadP}>Upload Image</Text>
+      </>
+    )}
+  </View>
+  <Text style={s.profilePicLabel}>Profile Picture</Text>
+</TouchableOpacity>
           {/* Full Name */}
           
           <TextInput
@@ -243,6 +313,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.xs,
+    overflow: 'hidden'
   },
   uploadIcon:      { fontSize: 40, color:'black' },
   profilePicLabel: { fontSize: 20, color:'#022C0F', fontWeight: '600' },
@@ -284,7 +355,11 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
     marginTop: Spacing.xs,
   },
- 
+ profileImageFill: {
+  width: '100%',
+  height: '100%',
+  borderRadius: 999,
+},
  napep: {
   width: 48,
   height: 48,

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-
+import React, { useState, useRef } from 'react';
+import { Animated, PanResponder } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import {
   View,
   Text,
@@ -88,9 +89,8 @@ const MapHeader = () => (
     source={require('../assets/map_aerial.png')}
     style={styles.mapHeader}
     resizeMode="cover"
-  >
-    <SafeAreaView edges={['top']} style={styles.mapHeaderSafe} />
-  </ImageBackground>
+  />
+  
 );
 
 /** Single route card */
@@ -103,7 +103,9 @@ const RouteCard = ({ route }) => (
         {route.eta}
       </Text>
       <View style={styles.routeCardTopRight}>
-        <FontAwesome5 name="car-side" size={20} color="#555" style={{ marginRight: 6 }} />
+        
+        <Image
+                                source={require('../assets/Car icon 5.png')} size={20} color="#555" style={{ marginRight: 6 }} />
         <Text style={styles.distanceText}>{route.distance}</Text>
       </View>
     </View>
@@ -177,7 +179,26 @@ const BottomTabBar = ({ activeTab, onPress, navigation }) => (
     })}
   </View>
 );
+const SHEET_COLLAPSED_TOP = 120;
+const SCREEN_HEIGHT = Dimensions.get('window').height; // add height to your existing Dimensions line
 
+const RCCG_REGION = {
+  latitude:      6.7433,
+  longitude:     3.5247,
+  latitudeDelta: 0.018,
+  longitudeDelta: 0.018,
+};
+
+const RCCG_MARKERS = [
+  { id: '1', title: 'Main Gate',         coordinate: { latitude: 6.7480, longitude: 3.5230 } },
+  { id: '2', title: 'Old Auditorium',    coordinate: { latitude: 6.7445, longitude: 3.5255 } },
+  { id: '3', title: 'Car Park B',        coordinate: { latitude: 6.7438, longitude: 3.5240 } },
+  { id: '4', title: 'Car Park C',        coordinate: { latitude: 6.7425, longitude: 3.5270 } },
+  { id: '5', title: 'Tree of Life Gate', coordinate: { latitude: 6.7415, longitude: 3.5220 } },
+  { id: '6', title: 'New Auditorium',    coordinate: { latitude: 6.7460, longitude: 3.5280 } },
+  { id: '7', title: 'Prayer Foyer',      coordinate: { latitude: 6.7450, longitude: 3.5248 } },
+  { id: '8', title: 'Youth Centre',      coordinate: { latitude: 6.7430, longitude: 3.5300 } },
+];
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 const HomeScreen = ({navigation}) => {
@@ -191,16 +212,98 @@ const HomeScreen = ({navigation}) => {
       r.destination.toLowerCase().includes(q)
     );
   });
+const [mapExpanded, setMapExpanded] = useState(false);
+const sheetAnim    = useRef(new Animated.Value(0)).current;
+const dragStartVal = useRef(0);
 
+const mapHeight = sheetAnim.interpolate({
+  inputRange:  [0, 1],
+  outputRange: [SHEET_COLLAPSED_TOP, SCREEN_HEIGHT],
+  extrapolate: 'clamp',
+});
+
+const contentOpacity = sheetAnim.interpolate({
+  inputRange:  [0, 0.4],
+  outputRange: [1, 0],
+  extrapolate: 'clamp',
+});
+
+const panResponder = useRef(
+  PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder:  () => true,
+    onPanResponderGrant: () => {
+      dragStartVal.current = sheetAnim._value;
+    },
+    onPanResponderMove: (_, gestureState) => {
+      const delta = -gestureState.dy / (SCREEN_HEIGHT - SHEET_COLLAPSED_TOP);
+      const next  = Math.max(0, Math.min(1, dragStartVal.current + delta));
+      sheetAnim.setValue(next);
+    },
+    onPanResponderRelease: (_, gestureState) => {
+      const shouldExpand = gestureState.dy < -60 || gestureState.vy < -0.5;
+      Animated.spring(sheetAnim, {
+        toValue:         shouldExpand ? 1 : 0,
+        useNativeDriver: false,
+        bounciness:      4,
+      }).start(() => setMapExpanded(shouldExpand));
+    },
+  })
+).current;
+
+const collapseMap = () => {
+  Animated.spring(sheetAnim, {
+    toValue:         0,
+    useNativeDriver: false,
+    bounciness:      4,
+  }).start(() => setMapExpanded(false));
+};
   return (
-    <View style={styles.root}>
+     <SafeAreaView
+      style={styles.root}
+      edges={['bottom']}  // ✅ only bottom — top is handled by StatusBar/map
+    >
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
       {/* Aerial map header strip */}
-      <MapHeader />
+     {/* MAP — animated height, drag to expand */}
+<Animated.View style={[styles.mapLayer, { height: mapHeight }]}>
+  <MapView
+    provider={PROVIDER_GOOGLE}
+    style={StyleSheet.absoluteFillObject}
+    initialRegion={RCCG_REGION}
+    showsUserLocation
+    showsCompass
+  >
+    {RCCG_MARKERS.map((m) => (
+      <Marker
+        key={m.id}
+        coordinate={m.coordinate}
+        title={m.title}
+        pinColor="#022C0F"
+      />
+    ))}
+  </MapView>
+
+  {/* Drag handle pill */}
+  <View style={styles.dragHandleWrapper} {...panResponder.panHandlers}>
+    <View style={styles.dragHandle} />
+  </View>
+
+  {/* Close button — only when fully expanded */}
+  {mapExpanded && (
+    <TouchableOpacity style={styles.closeMapBtn} onPress={collapseMap}>
+      <Ionicons name="chevron-down-circle" size={36} color="#fff" />
+    </TouchableOpacity>
+  )}
+</Animated.View>
 
       {/* Body */}
-      <View style={styles.body}>
+      {/* CONTENT — fades out as map expands */}
+<Animated.View style={[styles.body, { opacity: contentOpacity }]}
+  pointerEvents={mapExpanded ? 'none' : 'auto'}
+>
+ 
         {/* Search bar */}
         <View style={styles.searchWrapper}>
           <Ionicons name="search" size={16} color="#999" style={styles.searchIcon} />
@@ -228,10 +331,10 @@ const HomeScreen = ({navigation}) => {
           {/* Extra breathing room above tab bar */}
           <View style={{ height: 16 }} />
         </ScrollView>
-      </View>
+      </Animated.View>
 
       <BottomTabBar activeTab={activeTab} onPress={setActiveTab} navigation={navigation} />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -266,7 +369,32 @@ const styles = StyleSheet.create({
   mapHeaderSafe: {
     flex: 1,
   },
-
+mapLayer: {
+  width: '100%',
+  overflow: 'hidden',
+  zIndex: 10,
+},
+dragHandleWrapper: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  alignItems: 'center',
+  paddingBottom: 8,
+  paddingTop: 12,
+},
+dragHandle: {
+  width: 44,
+  height: 5,
+  borderRadius: 3,
+  backgroundColor: 'rgba(255,255,255,0.85)',
+},
+closeMapBtn: {
+  position: 'absolute',
+  bottom: 20,
+  alignSelf: 'center',
+  zIndex: 30,
+},
   // ── Body ──
   body: {
     flex: 1,
@@ -386,26 +514,26 @@ const styles = StyleSheet.create({
   },
 
   // ── Bottom tab bar ──
-  tabBar: {
-    flexDirection: 'row',
-    borderTopRightRadius: 20,
-    marginBottom: 45,
-    borderTopLeftRadius: 20,
-    backgroundColor: '#ffffff',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E0E0E0',
-    paddingBottom: Platform.OS === 'ios' ? 20 : 8,
-    paddingTop: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-      },
-      android: { elevation: 8 },
-    }),
-  },
+ tabBar: {
+  flexDirection: 'row',
+  borderTopRightRadius: 20,
+  borderTopLeftRadius: 20,
+  backgroundColor: '#ffffff',
+  borderTopWidth: StyleSheet.hairlineWidth,
+  borderTopColor: '#E0E0E0',
+  paddingBottom: 8,   // ✅ flat value — SafeAreaView handles the iPhone home indicator
+  paddingTop: 12,
+  // remove marginBottom entirely ✅
+  ...Platform.select({
+    ios: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+    },
+    android: { elevation: 8 },
+  }),
+},
   tabItem: {
     flex: 1,
     alignItems: 'center',

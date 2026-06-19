@@ -1,247 +1,410 @@
-// screens/MyProfileScreen.jsx
 import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
   ScrollView,
+  StyleSheet,
+  Switch,
+  StatusBar,
+  Platform,
 } from 'react-native';
-import { Colors, FontSize, Radius, Spacing } from '../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { useDriver } from './context/DriverContext';
 
-export default function MyProfileScreen({ navigation }) {
-  const [personalOpen, setPersonalOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [routesOpen,   setRoutesOpen]   = useState(false);
+// ── Tokens ────────────────────────────────────────────────────────
+const C = {
+  primary:      '#022C0F',
+  primaryBtn:   '#045109',
+  white:        '#FFFFFF',
+  text:         '#111111',
+  muted:        '#666666',
+  bg:           '#F5F5F5',
+  cardBg:       '#FFFFFF',
+  inputBorder:  '#E0E0E0',
+  profileCard:  '#E8E8E8',
+  switchTrack:  '#045109',
+  advertBg:     '#F0F0F0',
+  advertBorder: '#DDDDDD',
+};
+
+// ── Menu Items ────────────────────────────────────────────────────
+const MAIN_MENU = [
+  { id: 'profile',   label: 'Profile',   icon: 'person-circle-outline' },
+  { id: 'route',     label: 'Route',     icon: 'git-branch-outline' },
+  { id: 'help',      label: 'Help',      icon: 'help-circle-outline' },
+  { id: 'safety',    label: 'Safety',    icon: 'shield-checkmark-outline' },
+  { id: 'settings',  label: 'Settings',  icon: 'settings-outline' },
+  { id: 'update',    label: 'Update',    icon: 'information-circle-outline' },
+];
+
+// ── Screen ────────────────────────────────────────────────────────
+export default function ProfileScreen({ navigation }) {
+  const { driverProfile } = useDriver();
+
+  const [notificationsOn, setNotificationsOn] = useState(true);
+  const [darkModeOn, setDarkModeOn]           = useState(false);
+
+  const fullName = driverProfile.fullName || 'Favour Osato';
+  const email    = 'favosato23@gmail.com';
+  const phone    = '|08133384769';
+  const role     = 'City Commuter';
+
+  const handleMenuPress = (id) => {
+    const routes = {
+      profile:  'EditProfile',
+      route:    'RouteScreen',
+      help:     'HelpScreen',
+      safety:   'SafetyScreen',
+      settings: 'SettingsScreen',
+      update:   'UpdateScreen',
+    };
+    if (routes[id]) navigation.navigate(routes[id]);
+  };
 
   return (
-    <ScrollView contentContainerStyle={s.container}>
+    <View style={s.root}>
+      <StatusBar barStyle="dark-content" backgroundColor={C.bg} />
 
-      {/* ── Title ── */}
-      <Text style={s.pageTitle}>My Profile</Text>
-
-      {/* ── Avatar ── */}
-      <View style={s.avatarSection}>
-        <View style={s.avatarCircle}>
-          <Text style={s.avatarEmoji}>👤</Text>
-        </View>
-        <Text style={s.name}>Favour Osato</Text>
-        <Text style={s.contact}>favosato23@gmail.com | 0813384769</Text>
+      {/* ── Top bar ── */}
+      <View style={s.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
+          <Ionicons name="chevron-back" size={20} color={C.text} />
+          <Text style={s.backText}>Account</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* ── Personal Details ── */}
-      <TouchableOpacity
-        style={s.section}
-        onPress={() => setPersonalOpen(!personalOpen)}
+      <ScrollView
+        contentContainerStyle={s.container}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>Personal details</Text>
-          <Text style={s.chevron}>{personalOpen ? '▲' : '▼'}</Text>
-        </View>
-        {personalOpen && (
-          <View style={s.sectionContent}>
-            {[
-              ['Full Name',  'Favour Osato'],
-              ['Email',      'favosato23@gmail.com'],
-              ['Phone',      '0813384769'],
-              ['Drivers ID', 'RCT-02'],
-            ].map(([label, value]) => (
-              <View key={label} style={s.detailRow}>
-                <Text style={s.detailLabel}>{label}</Text>
-                <Text style={s.detailValue}>{value}</Text>
+
+        {/* ── Profile Card ── */}
+        <View style={s.profileCard}>
+          <View style={s.profileImageWrapper}>
+            {driverProfile.profileImage ? (
+              <Image
+                source={{ uri: driverProfile.profileImage }}
+                style={s.profileImage}
+              />
+            ) : (
+              <View style={s.profileImageFallback}>
+                <Text style={s.profileInitial}>
+                  {fullName[0]?.toUpperCase() || '?'}
+                </Text>
               </View>
-            ))}
+            )}
           </View>
-        )}
-      </TouchableOpacity>
 
-      {/* ── Settings ── */}
-      <TouchableOpacity
-        style={s.section}
-        onPress={() => setSettingsOpen(!settingsOpen)}
-      >
-        <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>Settings</Text>
-          <Text style={s.chevron}>{settingsOpen ? '▲' : '▼'}</Text>
+          <Text style={s.profileName}>{fullName}</Text>
+          <Text style={s.profileContact}>{email}{phone}</Text>
+          <Text style={s.profileRole}>{role}</Text>
         </View>
-        {settingsOpen && (
-          <View style={s.sectionContent}>
-            <TouchableOpacity
-              style={s.settingRow}
-              onPress={() => navigation.navigate('NewPassword')}
-            >
-              <Text style={s.settingLabel}>🔒  Change Password</Text>
-              <Text style={s.chevron}>›</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={s.settingRow}>
-              <Text style={s.settingLabel}>🔔  Notifications</Text>
-              <Text style={s.chevron}>›</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={s.settingRow}
-              onPress={() => navigation.navigate('Landing')}
-            >
-              <Text style={[s.settingLabel, { color: Colors.secondary }]}>🚪  Log out</Text>
-              <Text style={s.chevron}>›</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </TouchableOpacity>
 
-      {/* ── Routes ── */}
-      <TouchableOpacity
-        style={s.section}
-        onPress={() => setRoutesOpen(!routesOpen)}
-      >
-        <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>Routes</Text>
-          <Text style={s.chevron}>{routesOpen ? '▲' : '▼'}</Text>
-        </View>
-        {routesOpen && (
-          <View style={s.sectionContent}>
-            {[
-              'Car pack B → Car Pack C Gate',
-              'Car pack B → River Jordan',
-              'Main Gate → Old Arena',
-            ].map((route) => (
+        {/* ── Main Menu Card ── */}
+        <View style={s.menuCard}>
+          {MAIN_MENU.map((item, index) => (
+            <React.Fragment key={item.id}>
               <TouchableOpacity
-                key={route}
-                style={s.routeRow}
-                onPress={() => navigation.navigate('RouteMap')}
+                style={s.menuRow}
+                onPress={() => handleMenuPress(item.id)}
+                activeOpacity={0.7}
               >
-                <Text style={s.routeLabel}>📍  {route}</Text>
-                <Text style={s.chevron}>›</Text>
+                <Ionicons name={item.icon} size={20} color={C.text} style={s.menuIcon} />
+                <Text style={s.menuLabel}>{item.label}</Text>
+                <Ionicons name="chevron-forward" size={16} color={C.muted} />
               </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </TouchableOpacity>
+              {index < MAIN_MENU.length - 1 && <View style={s.menuDivider} />}
+            </React.Fragment>
+          ))}
+        </View>
 
-    </ScrollView>
+        {/* ── Community ── */}
+        <TouchableOpacity
+          style={s.communityCard}
+          onPress={() => navigation.navigate('CommunityScreen')}
+          activeOpacity={0.8}
+        >
+          <View style={s.communityLeft}>
+            <Ionicons name="people-circle-outline" size={22} color={C.text} />
+            <Text style={s.communityLabel}>Community</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={C.muted} />
+        </TouchableOpacity>
+
+        {/* ── Preferences Card ── */}
+        <View style={s.menuCard}>
+
+          {/* Preferred Start Location */}
+          <TouchableOpacity
+            style={s.menuRow}
+            onPress={() => navigation.navigate('StartLocation')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="location-outline" size={20} color={C.text} style={s.menuIcon} />
+            <Text style={s.menuLabel}>Preferred Start Location</Text>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
+          </TouchableOpacity>
+
+          <View style={s.menuDivider} />
+
+          {/* Notification Toggle */}
+          <View style={s.menuRow}>
+            <Ionicons name="notifications-outline" size={20} color={C.text} style={s.menuIcon} />
+            <Text style={s.menuLabel}>Notification</Text>
+            <Switch
+              value={notificationsOn}
+              onValueChange={setNotificationsOn}
+              trackColor={{ false: '#CCCCCC', true: C.switchTrack }}
+              thumbColor={C.white}
+              style={s.toggle}
+            />
+          </View>
+
+          <View style={s.menuDivider} />
+
+          {/* Language */}
+          <TouchableOpacity
+            style={s.menuRow}
+            onPress={() => navigation.navigate('LanguageScreen')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="language-outline" size={20} color={C.text} style={s.menuIcon} />
+            <Text style={s.menuLabel}>Language</Text>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
+          </TouchableOpacity>
+
+          <View style={s.menuDivider} />
+
+          {/* Dark Mode Toggle */}
+          <View style={s.menuRow}>
+            <Ionicons name="sunny-outline" size={20} color={C.text} style={s.menuIcon} />
+            <Text style={s.menuLabel}>Dark mode</Text>
+            <Switch
+              value={darkModeOn}
+              onValueChange={setDarkModeOn}
+              trackColor={{ false: '#CCCCCC', true: C.switchTrack }}
+              thumbColor={C.white}
+              style={s.toggle}
+            />
+          </View>
+
+        </View>
+
+        {/* ── Advert Portal ── */}
+        <View style={s.advertCard}>
+          <View style={s.advertLeft}>
+            <View style={s.advertIconBox}>
+              <Ionicons name="megaphone-outline" size={22} color={C.primary} />
+            </View>
+            <View style={s.advertText}>
+              <Text style={s.advertTitle}>ADVERT PORTAL</Text>
+              <Text style={s.advertSub}>
+                Promote your business, Program or event for to fellow commuters on our city home board
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity style={s.advertBtn} activeOpacity={0.85}>
+            <Text style={s.advertBtnText}>SUBMIT AD</Text>
+          </TouchableOpacity>
+        </View>
+
+      </ScrollView>
+    </View>
   );
 }
 
+// ── Styles ────────────────────────────────────────────────────────
 const s = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: C.bg,
+  },
+
+  // Top bar
+  topBar: {
+    paddingTop: Platform.OS === 'ios' ? 56 : 36,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    backgroundColor: C.bg,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  backText: {
+    fontSize: 15,
+    color: C.text,
+    fontWeight: '500',
+  },
+
+  // Scroll
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.background,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xxl,
-    paddingBottom: Spacing.xxl,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    gap: 12,
   },
 
-  pageTitle: {
-    fontSize: FontSize.xl,
-    fontWeight: '900',
-    color: Colors.text,
-    marginBottom: Spacing.lg,
-  },
-
-  // Avatar
-  avatarSection: {
+  // Profile card
+  profileCard: {
+    backgroundColor: C.profileCard,
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
   },
-  avatarCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.inputBg,
+  profileImageWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: C.primary,
+    marginBottom: 10,
+    backgroundColor: '#C8E6C9',
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  profileImageFallback: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: Colors.primary,
-    marginBottom: Spacing.sm,
-    overflow: 'hidden',
+    backgroundColor: '#C8E6C9',
   },
-  avatarEmoji: { fontSize: 48 },
-  name: {
-    fontSize: FontSize.lg,
-    fontWeight: '800',
-    color: Colors.text,
-    marginBottom: Spacing.xs,
-  },
-  contact: {
-    fontSize: FontSize.xs,
-    color: Colors.textMuted,
-  },
-
-  // Sections
-  section: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    marginBottom: Spacing.md,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: Spacing.md,
-  },
-  sectionTitle: {
-    fontSize: FontSize.md,
+  profileInitial: {
+    fontSize: 36,
     fontWeight: '700',
-    color: Colors.text,
+    color: C.primary,
   },
-  chevron: {
-    fontSize: FontSize.md,
-    color: Colors.textMuted,
+  profileName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: C.text,
+    marginBottom: 2,
   },
-  sectionContent: {
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    padding: Spacing.md,
+  profileContact: {
+    fontSize: 11,
+    color: C.muted,
+    marginBottom: 4,
   },
-
-  // Personal details
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.xs + 2,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
-  },
-  detailLabel: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
+  profileRole: {
+    fontSize: 13,
     fontWeight: '600',
+    color: C.primary,
   },
-  detailValue: {
-    fontSize: FontSize.sm,
-    color: Colors.text,
+
+  // Menu card
+  menuCard: {
+    backgroundColor: C.cardBg,
+    borderRadius: 16,
+    overflow: 'hidden',
+    paddingHorizontal: 4,
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 12,
+  },
+  menuIcon: {
+    marginRight: 12,
+  },
+  menuLabel: {
+    flex: 1,
+    fontSize: 14,
+    color: C.text,
+    fontWeight: '500',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: C.inputBorder,
+    marginHorizontal: 12,
+  },
+
+  // Community
+  communityCard: {
+    backgroundColor: C.cardBg,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  communityLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  communityLabel: {
+    fontSize: 14,
+    color: C.text,
     fontWeight: '500',
   },
 
-  // Settings rows
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm + 2,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
-  },
-  settingLabel: {
-    fontSize: FontSize.sm,
-    color: Colors.text,
-    fontWeight: '500',
+  // Toggle
+  toggle: {
+    transform: [{ scaleX: Platform.OS === 'ios' ? 0.8 : 1 }, { scaleY: Platform.OS === 'ios' ? 0.8 : 1 }],
   },
 
-  // Route rows
-  routeRow: {
+  // Advert card
+  advertCard: {
+    backgroundColor: C.advertBg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: C.advertBorder,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Spacing.sm + 2,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
+    justifyContent: 'space-between',
+    padding: 12,
+    gap: 8,
   },
-  routeLabel: {
-    fontSize: FontSize.sm,
-    color: Colors.text,
-    fontWeight: '500',
+  advertLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  advertIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: C.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  advertText: {
+    flex: 1,
+  },
+  advertTitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: C.text,
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  advertSub: {
+    fontSize: 9,
+    color: C.muted,
+    lineHeight: 13,
+  },
+  advertBtn: {
+    backgroundColor: C.primary,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignSelf: 'center',
+  },
+  advertBtnText: {
+    color: C.white,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 });

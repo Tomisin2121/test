@@ -82,7 +82,7 @@ export default function RouteMapScreen({ navigation }) {
       <SafeAreaView edges={['top']} style={styles.topBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={18} color="#ffff" />
-          <Text style={styles.backLabel}>Routing</Text>
+          <Text style={styles.backLabel}>Back</Text>
         </TouchableOpacity>
 
         {/* Toggle pill */}
