@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import {
   View,
   Text,
@@ -388,8 +389,9 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderTopRightRadius: 20,
+    marginBottom: 45,
     borderTopLeftRadius: 20,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#ffffff',
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#E0E0E0',
     paddingBottom: Platform.OS === 'ios' ? 20 : 8,

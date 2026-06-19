@@ -11,8 +11,9 @@ export default function NearestNapepScreen({ navigation }) {
 
       {/* ── Tuk-tuk Image ── */}
       <View style={s.imageContainer}>
-        {/* Replace with actual image: <Image source={require('../assets/napep.png')} style={s.napepImage} /> */}
-        <Text style={s.napepEmoji}>🛺</Text>
+        <Image
+                        source={require('../assets/napep icon 1 (2).png')}
+                             style={s.napep} />
       </View>
 
       {/* ── Title ── */}
@@ -72,25 +73,25 @@ const s = StyleSheet.create({
   },
 
   clickBtn: {
-    backgroundColor: Colors.inputBg,
+    backgroundColor: '#D9D9D9',
     borderRadius: Radius.xl,
     paddingVertical: Spacing.md - 2,
     paddingHorizontal: Spacing.xxl,
     borderWidth: 1,
-    borderColor: Colors.inputBorder,
+    borderColor: '#121212',
     marginBottom: Spacing.md,
     width: '100%',
     alignItems: 'center',
   },
   clickText: {
-    fontSize: FontSize.md,
+    fontSize: 18,
     color: Colors.text,
     fontWeight: '600',
   },
 
   backText: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
+    fontSize: 16,
+    color: '#8E9496',
     textDecorationLine: 'underline',
     marginBottom: Spacing.xl,
   },
@@ -98,15 +99,18 @@ const s = StyleSheet.create({
   spacer: { flex: 1 },
 
   signupText: {
-    fontSize: FontSize.md,
-    color: Colors.link,
+    fontSize: 18,
+    color: '#035E97',
     fontWeight: '700',
     textAlign: 'center',
   },
   ridersOnly: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
+    fontSize: 16,
+    color: 'black',
     textAlign: 'center',
     marginTop: 2,
   },
+  napep: {
+    marginTop: 140
+  }
 });

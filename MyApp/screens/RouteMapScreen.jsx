@@ -383,6 +383,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
     zIndex: 20,
+    
     elevation: 8,
   },
   tabItem: {

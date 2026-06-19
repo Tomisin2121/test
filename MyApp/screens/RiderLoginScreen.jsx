@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, KeyboardAvoidingView, Platform,
+  StyleSheet, ScrollView, KeyboardAvoidingView, Platform,Image
 } from 'react-native';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 
@@ -17,7 +17,7 @@ export default function RiderLoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
 
-        <View style={s.card}>
+        <View>
           <Text style={s.title}>Login</Text>
 
           {/* Email */}
@@ -63,18 +63,23 @@ export default function RiderLoginScreen({ navigation }) {
 
           {/* Social Full Buttons */}
           <TouchableOpacity style={s.socialFullBtn}>
-            <Text style={s.googleG}>G</Text>
+            <Image
+                            source={require('../assets/google.png')}
+                                 style={s.google} />
             <Text style={s.socialFullBtnText}>Continue with Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={s.socialFullBtn}>
-            <Text style={s.socialFullBtnText}>🍎  Continue with iOS</Text>
+            <Image
+                            source={require('../assets/apple.png')}
+                                 style={s.google} />
+            <Text style={s.socialFullBtnText}> Continue with iOS</Text>
           </TouchableOpacity>
 
           {/* Sign Up Link */}
           <View style={s.bottomRow}>
             <Text style={s.bottomText}>Need an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('RidersRegistration')}>
+            <TouchableOpacity onPress={() => navigation.navigate('DriversRegistration')}>
               <Text style={s.linkText}>Sign up</Text>
             </TouchableOpacity>
           </View>
@@ -91,46 +96,42 @@ const s = StyleSheet.create({
     backgroundColor: Colors.background,
     justifyContent: 'center',
     padding: Spacing.md,
+    marginTop: 60
   },
 
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-
+ 
   title: {
-    fontSize: FontSize.xxl,
+    fontSize: 40,
     fontWeight: '800',
     color: Colors.text,
     marginBottom: Spacing.lg,
+    marginTop: -120,
+    textAlign: 'center'
   },
 
   input: {
-    backgroundColor: Colors.inputBg,
+    backgroundColor: '#D4D3D3',
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: Spacing.sm + 3,
     fontSize: FontSize.md,
     color: Colors.text,
     borderWidth: 1,
     borderColor: Colors.inputBorder,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xl,
   },
 
   forgotBtn: {
-    alignSelf: 'flex-end',
+    alignSelf: 'center',
     marginBottom: Spacing.md,
+   
   },
   forgotText: {
-    fontSize: FontSize.sm,
-    color: Colors.textMuted,
+    fontSize: 17,
+    color: '#8E9496',
     fontWeight: '500',
+    marginBottom:2
+    
   },
 
   primaryBtn: {
@@ -159,23 +160,31 @@ const s = StyleSheet.create({
   socialFullBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    
     borderWidth: 1.5,
     borderColor: Colors.inputBorder,
-    borderRadius: Radius.md,
-    paddingVertical: Spacing.sm + 2,
-    marginBottom: Spacing.sm,
+    borderRadius: Radius.xl,
+    paddingVertical: Spacing.sm - 3,
+    marginBottom: Spacing.xl,
     gap: Spacing.sm,
-    backgroundColor: Colors.white,
+    backgroundColor: '#D4D3D3',
   },
-  googleG: { fontSize: FontSize.md, fontWeight: '900', color: '#EA4335' },
-  socialFullBtnText: { fontSize: FontSize.sm, color: Colors.text, fontWeight: '600' },
+  google: {
+    width: 40,
+    height: 40,
+    marginLeft:35
+  },
+  apple: {
+    width: 40,
+    height: 40
+  },
+  socialFullBtnText: { fontSize: 14.5, color: 'Colors.text', fontWeight: '600', marginLeft:20},
 
   bottomRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: Spacing.sm,
   },
-  bottomText: { fontSize: FontSize.sm, color: Colors.textMuted },
-  linkText:   { fontSize: FontSize.sm, color: Colors.link, fontWeight: '700' },
+  bottomText: { fontSize: 15, color: Colors.textMuted },
+  linkText:   { fontSize: 15, color: '#076283', fontWeight: '700' },
 });

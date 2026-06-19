@@ -3,17 +3,18 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ScrollView, KeyboardAvoidingView,
-  Platform, Modal,
+  Platform, Modal,Image
 } from 'react-native';
 import { Colors, FontSize, Radius, Spacing } from '../theme';
 
 const AXES = [
-  { id: '1', label: 'Eliad Redemption Camp Arena (Victoria)' },
-  { id: '2', label: 'Galaxy Anastasia Area of the' },
-  { id: '3', label: 'Gate of the South Area' },
-  { id: '4', label: 'Canaan & Aronex areas' },
-  { id: '5', label: 'Canaan & Aronex areas 2' },
-  { id: '6', label: 'Canaan & Aronex areas 3' },
+  { id: '1', label: 'Main Gate to old Arena' },
+  { id: '2', label: 'Elliot Hostel to Glory Arena' },
+  { id: '3', label: 'Glory Area To Tree of Life' },
+  { id: '4', label: 'Car Park B to New Arena ' },
+  { id: '5', label: 'Tree of Life To Youth Centre' },
+  { id: '6', label: 'Car Pack C to New Arena' },
+
 ];
 
 export default function DriversRegistrationScreen({ navigation }) {
@@ -54,7 +55,14 @@ export default function DriversRegistrationScreen({ navigation }) {
 
         {/* ── Header ── */}
         <View style={s.header}>
-          <Text style={s.headerIcon}>🛺</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
+                    <Image
+                                source={require('../assets/backarrow.png')}
+                                     style={s.backarrow} />  
+                  </TouchableOpacity>
+        <Image
+                                source={require('../assets/Napep white 1.png')}
+                                     style={s.napep} />  
           <Text style={s.headerTitle}>DRIVERS REGISTRATION</Text>
         </View>
 
@@ -64,11 +72,13 @@ export default function DriversRegistrationScreen({ navigation }) {
           <TouchableOpacity style={s.profilePicBox}>
             <View style={s.uploadCircle}>
               <Text style={s.uploadIcon}>+</Text>
+              <Text style={s.uploadP}>Upload Image</Text>
             </View>
-            <Text style={s.profilePicLabel}>Update Picture</Text>
+            <Text style={s.profilePicLabel}>Profile Picture</Text>
           </TouchableOpacity>
 
           {/* Full Name */}
+          
           <TextInput
             style={s.input}
             placeholder="Full Name"
@@ -116,12 +126,13 @@ export default function DriversRegistrationScreen({ navigation }) {
             />
             <TouchableOpacity style={s.vehicleImageBtn}>
               <Text style={s.vehicleImageText}>Vehicle Image</Text>
-              <Text style={s.vehicleImageIcon}>📷</Text>
+             
             </TouchableOpacity>
           </View>
 
           {/* Operational Axis */}
           <Text style={s.sectionLabel}>SELECT OPERATIONAL AXIS</Text>
+          <ScrollView>
           <View style={s.axesGrid}>
             {AXES.map((axis) => (
               <TouchableOpacity
@@ -136,6 +147,7 @@ export default function DriversRegistrationScreen({ navigation }) {
               </TouchableOpacity>
             ))}
           </View>
+          </ScrollView>
 
           {/* Submit */}
           <TouchableOpacity style={s.submitBtn} onPress={handleSubmit}>
@@ -158,7 +170,9 @@ export default function DriversRegistrationScreen({ navigation }) {
             {/* Badge checkmark */}
             <View style={s.badgeOuter}>
               <View style={s.badgeInner}>
-                <Text style={s.badgeCheck}>✓</Text>
+                <Image
+                                source={require('../assets/verified icon 1 (1).png')}
+                                     style={s.verify} />  
               </View>
             </View>
 
@@ -189,18 +203,22 @@ export default function DriversRegistrationScreen({ navigation }) {
 const s = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'white',
     paddingBottom: Spacing.xxl,
   },
-
+  uploadP:{
+    color:'#022C0F'
+  },
   header: {
     backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.md,
+    paddingLeft: 8,
+    paddingVertical: Spacing.sm,
     paddingTop: Spacing.lg + 8,
-    gap: Spacing.sm,
+    gap: 16,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30
   },
   headerIcon:  { fontSize: 22 },
   headerTitle: {
@@ -209,25 +227,25 @@ const s = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1.5,
   },
-
+  
   form: { padding: Spacing.md },
 
   // Profile Pic
   profilePicBox:   { alignItems: 'center', marginBottom: Spacing.md },
   uploadCircle: {
-    width: 72,
-    height: 72,
+    width: 113,
+    height: 112,
     borderRadius: Radius.full,
-    backgroundColor: Colors.inputBg,
+    backgroundColor: '#D9D9D9',
     borderWidth: 2,
-    borderColor: Colors.inputBorder,
-    borderStyle: 'dashed',
+    borderColor: 'black',
+    borderStyle: 'solid',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.xs,
   },
-  uploadIcon:      { fontSize: 28, color: Colors.textMuted },
-  profilePicLabel: { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '600' },
+  uploadIcon:      { fontSize: 40, color:'black' },
+  profilePicLabel: { fontSize: 20, color:'#022C0F', fontWeight: '600' },
 
   input: {
     backgroundColor: Colors.inputBg,
@@ -242,7 +260,7 @@ const s = StyleSheet.create({
   },
 
   vehicleRow:   { flexDirection: 'row', gap: Spacing.sm },
-  vehicleInput: { flex: 1 },
+  vehicleInput: { flex: 1,},
   vehicleImageBtn: {
     flex: 1,
     backgroundColor: Colors.inputBg,
@@ -253,10 +271,10 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing.sm,
     gap: Spacing.xs,
-    paddingVertical: Spacing.sm,
+    paddingVertical: 4,
   },
   vehicleImageText: { fontSize: FontSize.xs, color: Colors.textMuted, fontWeight: '600' },
-  vehicleImageIcon: { fontSize: 18 },
+ 
 
   sectionLabel: {
     fontSize: FontSize.xs,
@@ -266,13 +284,24 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
     marginTop: Spacing.xs,
   },
-
+ 
+ napep: {
+  width: 48,
+  height: 48,
+  marginLeft: 16
+ },
   axesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.sm,
     marginBottom: Spacing.md,
+    borderColor:'#B9B6B6',
+    borderWidth:2,
+    padding: Spacing.sm,
+    borderRadius: 10,
+    height: 150
   },
+ 
   axisBox: {
     width: '47%',
     backgroundColor: Colors.white,
@@ -319,12 +348,13 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Spacing.xl,
+   padding:18
   },
   modalCard: {
     backgroundColor: Colors.white,
-    borderRadius: Radius.lg,
+    borderRadius: 40,
     padding: Spacing.xl,
+    
     width: '100%',
     alignItems: 'center',
     shadowColor: '#000',
@@ -332,41 +362,16 @@ const s = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 16,
     elevation: 10,
+    marginTop:220,
+    height:450
   },
-
+  verify: {
+    width: 208,
+    height: 208
+  },
   // Badge (gear/shield shape using nested circles)
-  badgeOuter: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.md,
-    // Octagon-like effect with border
-    borderWidth: 6,
-    borderColor: '#2D6A4F',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  badgeInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  badgeCheck: {
-    color: Colors.white,
-    fontSize: 32,
-    fontWeight: '900',
-  },
+ 
+  
 
   savedText: {
     fontSize: FontSize.xl,
@@ -377,7 +382,7 @@ const s = StyleSheet.create({
   },
 
   transitBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#045109',
     borderRadius: Radius.xl,
     paddingVertical: Spacing.md - 2,
     paddingHorizontal: Spacing.xl,
@@ -393,8 +398,8 @@ const s = StyleSheet.create({
   },
 
   doneText: {
-    fontSize: FontSize.md,
-    color: Colors.link,
+    fontSize: 18,
+    color: '#045109',
     fontWeight: '600',
   },
 });
