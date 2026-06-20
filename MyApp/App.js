@@ -19,6 +19,7 @@ import TransactionReceiptScreen           from './screens/TransactionReceiptScre
 import PaymentSuccessScreen          from './screens/PaymentSuccessScreen';
 import MyProfileScreen            from  './screens/MyProfileScreen'
 import PasswordChangedScreen from './screens/PasswordChangedScreen';
+import RoleSelectScreen from './screens/RoleSelectScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,8 +32,9 @@ export default function App() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Landing"              component={LandingPage} />
-        <Stack.Screen name="Login"                component={LoginScreen} />
+        <Stack.Screen name="RoleSelect"                component={RoleSelectScreen} />
         <Stack.Screen name="SignUp"               component={SignUpScreen} />
+        <Stack.Screen name="Login"                component={LoginScreen} />
         <Stack.Screen name="ForgotPassword"       component={ForgotPasswordScreen} />
         <Stack.Screen name="Verification"         component={VerificationScreen} />
         <Stack.Screen name="NewPassword"          component={NewPasswordScreen} />

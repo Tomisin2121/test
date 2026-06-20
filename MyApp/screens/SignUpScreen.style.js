@@ -238,5 +238,66 @@ apple: {
 google: {
   width: 65,
   height: 65
-}
+},
+// Add these to your existing StyleSheet
+
+passwordRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: Colors.inputBg,
+  borderRadius: Radius.md,
+  borderWidth: 1,
+  borderColor: Colors.inputBorder,
+  marginBottom: Spacing.sm,
+},
+passwordInput: {
+  flex: 1,
+  paddingHorizontal: Spacing.md,
+  paddingVertical: Spacing.sm + 2,
+  fontSize: FontSize.md,
+  color: Colors.text,
+},
+eyeBtn: {
+  paddingHorizontal: 12,
+},
+inputError: {
+  borderColor: '#EF4444',
+},
+errorText: {
+  fontSize: 11,
+  color: '#EF4444',
+  marginTop: -6,
+  marginBottom: 6,
+  marginLeft: 4,
+},
+strengthContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 10,
+  gap: 8,
+},
+strengthBarBg: {
+  flex: 1,
+  height: 4,
+  backgroundColor: '#E5E7EB',
+  borderRadius: 99,
+  overflow: 'hidden',
+},
+strengthBarFill: {
+  height: 4,
+  borderRadius: 99,
+},
+strengthLabel: {
+  fontSize: 11,
+  fontWeight: '600',
+  width: 48,
+},
+matchText: {
+  fontSize: 11,
+  color: '#22C55E',
+  marginTop: -6,
+  marginBottom: 8,
+  marginLeft: 4,
+  fontWeight: '600',
+},
 });

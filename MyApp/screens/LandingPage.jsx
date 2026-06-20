@@ -7,7 +7,7 @@ export default function LandingPage({ navigation }) {
 
   useEffect(() => {
   const timer = setTimeout(() => {
-    navigation.replace('SignUp');  // replace instead of navigate
+    navigation.replace('RoleSelect');  // replace instead of navigate
   }, 3000);
 
   return () => clearTimeout(timer);
