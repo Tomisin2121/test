@@ -1,5 +1,5 @@
 import './global.css';
-import './SuccessPage.css';
+import './successPage.css';
 
 export default function SuccessPage({ onNavigate }) {
   return (
