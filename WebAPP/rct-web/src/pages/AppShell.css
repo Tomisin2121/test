@@ -375,7 +375,7 @@
   transition: color 0.15s;
   min-width: 56px;
 }
-.bottom-nav-btn.active { color: var(--green-dark); font-weight: 700; }
+.bottom-nav-btn.active { color: var(--green-accent); font-weight: 700; }
 .bottom-nav-btn svg { width: 20px; height: 20px; }
 
 /* ── RESPONSIVE ─────────────────────────────────────── */
