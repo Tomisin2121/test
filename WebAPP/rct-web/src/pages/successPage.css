@@ -1,0 +1,43 @@
+.success-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-badge {
+  width: 100px;
+  height: 100px;
+  background: var(--green-dark);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  box-shadow: 0 0 0 14px var(--green-light);
+  position: relative;
+}
+
+/* Pulse animation on the badge ring */
+.success-badge::after {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 2px solid var(--green-accent);
+  opacity: 0;
+  animation: pulse-ring 1.6s ease-out 0.3s forwards;
+}
+
+@keyframes pulse-ring {
+  0%   { opacity: 0.6; transform: scale(0.9); }
+  100% { opacity: 0;   transform: scale(1.15); }
+}
+
+@media (max-width: 480px) {
+  .success-card {
+    justify-content: center;
+    min-height: 100vh;
+  }
+}

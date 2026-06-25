@@ -1,0 +1,70 @@
+.landing-screen {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(160deg, #1a3d2b 0%, #235c3a 50%, #1a3d2b 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 40px 32px;
+}
+
+/* Decorative background circles */
+.landing-bg-circles { position: absolute; inset: 0; pointer-events: none; }
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.circle-1 { width: 500px; height: 500px; top: -180px; right: -160px; }
+.circle-2 { width: 340px; height: 340px; bottom: -120px; left: -100px; }
+.circle-3 { width: 200px; height: 200px; top: 50%; left: -80px; transform: translateY(-50%); }
+
+.landing-content {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  text-align: center;
+}
+
+/* Logo */
+.landing-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.landing-icon {
+  width: 90px; height: 90pxl;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.landing-logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logo-line1 {
+ font-family: 'Poppins', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.logo-line2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
