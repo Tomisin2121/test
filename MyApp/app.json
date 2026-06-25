@@ -21,24 +21,36 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.jesuspikin.MyApp"
+      "package": "com.jesuspikin.MyApp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD55r1cVsXrge9qhQVuhn_hNiyYl6jVRQ8"
+        }
+      }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-font"
-    ],
+    "edgeToEdgeEnabled": true,
+    "package": "com.jesuspikin.MyApp",
     "extra": {
       "eas": {
         "projectId": "4dc1d47c-0dc3-4523-852c-14f9cb8574bd"
       }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/4dc1d47c-0dc3-4523-852c-14f9cb8574bd"
     }
+  },
+  "web": {
+    "favicon": "./assets/favicon.png"
+  },
+  "plugins": [
+    "expo-font"
+  ],
+  "extra": {
+    "eas": {
+      "projectId": "4dc1d47c-0dc3-4523-852c-14f9cb8574bd"
+    }
+  },
+  "runtimeVersion": {
+    "policy": "appVersion"
+  },
+  "updates": {
+    "url": "https://u.expo.dev/4dc1d47c-0dc3-4523-852c-14f9cb8574bd"
   }
 }

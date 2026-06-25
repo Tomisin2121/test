@@ -3,11 +3,11 @@ import { useState } from 'react';
 // Auth pages
 import LandingPage        from './pages/splash';
 import SignUpPage         from './pages/signuppage';
-import LoginPage         from './pages/Loginpage';
+import LoginPage         from './pages/loginpage';
 import ForgotPasswordPage from './pages/forgotpassword';
-import VerificationPage   from './pages/VerificationPage';
+import VerificationPage   from './pages/verificationPage';
 import NewPasswordPage    from './pages/newpasswordpage';
-import SuccessPage        from './pages/Successpage';
+import SuccessPage        from './pages/successpage';
 
 // App shell
 import AppShell from './pages/AppShell';
