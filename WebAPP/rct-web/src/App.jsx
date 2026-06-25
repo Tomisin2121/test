@@ -5,7 +5,7 @@ import LandingPage        from './pages/splash';
 import SignUpPage         from './pages/signuppage';
 import LoginPage         from './pages/loginpage';
 import ForgotPasswordPage from './pages/forgotpassword';
-import VerificationPage   from './pages/verificationPage';
+import VerificationPage   from './pages/verificationpage';
 import NewPasswordPage    from './pages/newpasswordpage';
 import SuccessPage        from './pages/successpage';
 
