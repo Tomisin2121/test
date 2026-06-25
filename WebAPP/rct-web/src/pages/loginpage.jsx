@@ -94,7 +94,7 @@ export default function LoginPage({ onNavigate }) {
           </a>
         </div>
 
-        <button className="btn-primary">Login</button>
+        <button className="btn-primary" onClick={() => onNavigate?.(role === 'admin' ? 'adminsim' : 'plan', role)}>Login</button>
 
         <div className="divider">or continue with</div>
 

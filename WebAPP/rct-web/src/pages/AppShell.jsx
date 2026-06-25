@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './AppShell.css';
 
-const navItems = [
+const regularNav = [
   {
     id: 'plan', label: 'Plan',
     icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
@@ -28,11 +28,30 @@ const navItems = [
   },
 ];
 
-const RAIL_PAGES = ['plan', 'wayfinder', 'napep'];
+const adminNav = [
+  {
+    id: 'adminsim', label: 'Simulate',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="7" cy="17" r="2" fill="currentColor"/></svg>
+  },
+  {
+    id: 'admincontrol', label: 'Control',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v3M12 6a5 5 0 015 5v3l1.5 3h-13L5 14v-3a5 5 0 015-5zM9.5 20a2.5 2.5 0 005 0"/></svg>
+  },
+  {
+    id: 'admindata', label: 'Map data',
+    icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 16v3a1 1 0 001 1h12a1 1 0 001-1v-3"/></svg>
+  },
+];
 
-export default function AppShell({ currentPage, onNavigate, children, hideRightPanel }) {
+const ADMIN_RAIL = ['adminsim', 'admincontrol', 'admindata'];
+const REGULAR_RAIL = ['plan', 'wayfinder', 'napep'];
+
+export default function AppShell({ currentPage, onNavigate, children, hideRightPanel, role }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const isAdmin = role === 'admin';
+  const navItems = isAdmin ? adminNav : regularNav;
+  const RAIL_PAGES = isAdmin ? ADMIN_RAIL : REGULAR_RAIL;
   const isRail = RAIL_PAGES.includes(currentPage);
 
   return (

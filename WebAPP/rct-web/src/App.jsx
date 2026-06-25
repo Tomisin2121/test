@@ -21,8 +21,14 @@ import DriverLoginPage     from './pages/DriverLoginPage';
 import ProfilePage         from './pages/ProfilePage';
 import PaymentPage         from './pages/PaymentPage';
 
+// Admin pages
+import AdminSimPage    from './pages/AdminSimPage';
+import AdminControlPage from './pages/AdminControlPage';
+import AdminDataPage   from './pages/AdminDataPage';
+
 export default function App() {
   const [page, setPage] = useState('landing');
+  const [role, setRole] = useState(null);
 
   // Wayfinder shared state
   const [wfRoutes, setWfRoutes]       = useState([]);
@@ -30,7 +36,13 @@ export default function App() {
   const [wfDest, setWfDest]           = useState('aud');
   const [wfPreferLit, setWfPreferLit] = useState(true);
 
-  const navigate = (p) => setPage(p);
+  const authPages = ['landing', 'login', 'signup', 'forgot-password', 'verification', 'new-password', 'success'];
+
+  const navigate = (p, userRole) => {
+    if (userRole) setRole(userRole);
+    if (authPages.includes(p)) setRole(null);
+    setPage(p);
+  };
 
   const handleRoutesReady = (routes, origin, destination, preferLit) => {
     setWfRoutes(routes);
@@ -49,6 +61,8 @@ export default function App() {
   if (page === 'success')         return <SuccessPage onNavigate={navigate} />;
 
   // Inner pages (wrapped in AppShell)
+  const isAdmin = role === 'admin';
+
   const innerPages = {
     plan:         <PlanPage onNavigate={navigate} onRoutesReady={handleRoutesReady} />,
     wayfinder:    <WayfinderRoutesPage routes={wfRoutes} origin={wfOrigin} destination={wfDest} preferLit={wfPreferLit} onNavigate={navigate} />,
@@ -57,11 +71,19 @@ export default function App() {
     driverlogin:  <DriverLoginPage onNavigate={navigate} />,
     profile:      <ProfilePage onNavigate={navigate} />,
     payment:      <PaymentPage onNavigate={navigate} />,
+    adminsim:     <AdminSimPage onNavigate={navigate} />,
+    admincontrol: <AdminControlPage onNavigate={navigate} />,
+    admindata:    <AdminDataPage onNavigate={navigate} />,
   };
 
+  const adminPages = ['adminsim', 'admincontrol', 'admindata'];
+  const hideRight = isAdmin
+    ? adminPages.includes(page)
+    : page === 'plan' || page === 'wayfinder' || page === 'napep';
+
   return (
-    <AppShell currentPage={page} onNavigate={navigate} hideRightPanel={page === 'plan'|| page === 'wayfinder' || page === 'napep'}>
-      {innerPages[page] ?? innerPages['plan']}
+    <AppShell currentPage={page} onNavigate={navigate} role={role} hideRightPanel={hideRight}>
+      {innerPages[page] ?? (isAdmin ? innerPages['adminsim'] : innerPages['plan'])}
     </AppShell>
   );
 }

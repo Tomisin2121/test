@@ -149,7 +149,7 @@ export default function SignUpPage({ onNavigate }) {
           {noMatch && <p style={{ color: 'var(--error)', fontSize: '0.8rem', marginTop: '6px' }}>✗ Passwords do not match</p>}
         </div>
 
-        <button className="btn-primary" onClick={() => onNavigate?.('plan')}>
+        <button className="btn-primary" onClick={() => onNavigate?.('plan', role)}>
           Create Account
         </button>
 
