@@ -395,10 +395,11 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas: "topbar" "main";
+    height: 100vh;
   }
   .sidebar { display: none; }
   .right-panel { display: none; }
   .mobile-topbar { display: flex; grid-area: topbar; }
   .mobile-bottom-nav { display: flex; }
-  .shell-main { padding-bottom: 72px; }
+  .shell-main { min-height: 0; padding-bottom: 72px; }
 }

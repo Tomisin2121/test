@@ -1039,11 +1039,69 @@
   .napep-split {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    height: auto;
-    overflow: visible;
+    overflow: hidden;
   }
-  .napep-panel { height: auto; }
+  .napep-panel {
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
   .napep-panel.collapsed { display: none; }
   .napep-collapse-btn { display: none; }
-  .napep-map-wrap { min-height: 380px; }
+  .napep-map-wrap { min-height: 50vh; }
+  .napep-panel-inner { padding: 16px 14px 20px; }
+  .napep-title { font-size: 1.1rem; }
+  .napep-sub { font-size: 0.75rem; }
+}
+
+@media (max-width: 768px) {
+  .napep-split {
+    position: fixed;
+    top: 52px; left: 0; right: 0; bottom: 72px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .napep-panel {
+    flex-shrink: 0;
+    min-height: calc(100vh - 52px - 72px);
+    max-height: none;
+    overflow-y: visible;
+    height: auto;
+  }
+  .napep-map-wrap {
+    flex-shrink: 0;
+    height: 60vh;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .napep-panel-inner { padding: 12px 12px 16px; }
+  .napep-title { font-size: 1rem; }
+  .napep-sub { font-size: 0.72rem; }
+  .napep-panel-header { margin-bottom: 10px; }
+  .napep-live-badge { font-size: 0.65rem; padding: 4px 8px; }
+  .napep-card { padding: 10px; gap: 8px; }
+  .napep-icon-wrap { width: 34px; height: 34px; }
+  .napep-icon-wrap svg { width: 18px; height: 18px; }
+  .napep-id { font-size: 0.78rem; }
+  .napep-status-tag { font-size: 0.6rem; padding: 1px 6px; }
+  .napep-driver { font-size: 0.7rem; }
+  .napep-route { font-size: 0.75rem; }
+  .napep-meta { gap: 6px; font-size: 0.68rem; }
+  .napep-book-btn { padding: 8px; font-size: 0.8rem; margin-top: 8px; }
+  .napep-map-wrap { min-height: 40vh; }
+  .napep-map-legend { right: 8px; bottom: 8px; padding: 8px 10px; font-size: 0.72rem; }
+  .napep-map-badge { top: 10px; left: 10px; font-size: 0.72rem; padding: 4px 10px; }
+
+  /* Route page mobile */
+  .route-card { padding: 12px; }
+  .route-name { font-size: 0.82rem; }
+  .route-desc { font-size: 0.75rem; }
+  .route-meta-row { gap: 10px; flex-wrap: wrap; }
+  .route-meta-item { font-size: 0.72rem; }
+  .route-inputs { padding: 12px; }
+  .route-input-field { font-size: 0.85rem; }
+  .route-status-badge { font-size: 0.65rem; padding: 2px 8px; }
 }

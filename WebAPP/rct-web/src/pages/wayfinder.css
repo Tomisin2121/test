@@ -218,11 +218,56 @@
   .plan-split {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    height: auto;
-    overflow: visible;
+    overflow: hidden;
   }
-  .plan-panel { height: auto; }
-  .plan-map-wrap { height: 380px; }
+  .plan-panel {
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .plan-map-wrap { min-height: 320px; }
+  .plan-panel-inner { padding: 20px 16px 32px; }
+}
+
+@media (max-width: 768px) {
+  .plan-split {
+    position: fixed;
+    top: 52px; left: 0; right: 0; bottom: 72px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .plan-panel {
+    flex-shrink: 0;
+    min-height: calc(100vh - 52px - 72px);
+    max-height: none;
+    overflow-y: visible;
+    height: auto;
+  }
+  .plan-map-wrap {
+    flex-shrink: 0;
+    height: 60vh;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .plan-panel-inner { padding: 16px 14px 24px; }
+  .plan-title { font-size: 1.15rem; }
+  .plan-sub { font-size: 0.78rem; margin-bottom: 16px; }
+  .plan-field { margin-bottom: 10px; }
+  .plan-select { padding: 9px 11px; font-size: 0.85rem; }
+  .plan-swap-btn { width: 36px; height: 36px; margin-bottom: 10px; }
+  .plan-toggle { padding: 11px 12px; }
+  .plan-toggle-label { font-size: 0.8rem; }
+  .plan-toggle-sub { font-size: 0.7rem; }
+  .plan-primary-btn { padding: 12px; font-size: 0.88rem; }
+  .plan-ghost-btn { padding: 9px; font-size: 0.8rem; margin-bottom: 16px; }
+  .plan-map-legend { right: 8px; bottom: 8px; padding: 8px 10px; font-size: 0.72rem; }
+  .plan-map-wrap { height: 50vh; min-height: 250px; }
+  .plan-sw { width: 36px; height: 22px; }
+  .plan-sw-thumb { width: 16px; height: 16px; }
+  .plan-toggle.on .plan-sw-thumb { transform: translateX(14px); }
 }
 
 /* ══════════════════════════════════════════════════
