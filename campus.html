@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wayfinder — Redemption City</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#13171e;          /* deepest chrome */
+    --ink2:#1a212b;         /* panels */
+    --ink3:#222b37;         /* raised */
+    --line:rgba(255,255,255,.09);
+    --line2:rgba(255,255,255,.16);
+    --txt:#eceae2;          /* primary text */
+    --txt2:#a3a99c;         /* secondary */
+    --txt3:#6f7568;         /* faint */
+    --lamp:#f2a82c;         /* signature amber: lit / guidance */
+    --lamp-glow:#f8c95f;
+    --clear:#2bb189;        /* teal: clear road */
+    --mid:#e9a52f;          /* moderate */
+    --heavy:#d6483b;        /* congestion */
+    --disp:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:var(--body);background:var(--ink);color:var(--txt);
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  /* ---------- shell ---------- */
+  .app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+  header.bar{
+    display:flex;align-items:center;gap:14px;padding:0 18px;height:56px;
+    background:var(--ink);border-bottom:1px solid var(--line);z-index:30;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:600;letter-spacing:.02em}
+  .lamp-dot{width:14px;height:14px;border-radius:50%;background:var(--lamp);
+    box-shadow:0 0 0 3px rgba(242,168,44,.18),0 0 18px 2px rgba(242,168,44,.55)}
+  .brand small{font-family:var(--body);font-weight:400;color:var(--txt2);letter-spacing:0;font-size:12px}
+  .bar-spacer{flex:1}
+  .userchip{display:flex;align-items:center;gap:9px;background:var(--ink2);border:1px solid var(--line);
+    padding:6px 8px 6px 12px;border-radius:999px;font-size:13px}
+  .userchip .role{color:var(--lamp);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .userchip button{background:var(--ink3);border:1px solid var(--line);color:var(--txt2);
+    border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:var(--body)}
+  .userchip button:hover{color:var(--txt);border-color:var(--line2)}
+
+  .main{display:grid;grid-template-columns:72px 372px 1fr;min-height:0}
+  @media(max-width:900px){.main{grid-template-columns:72px 1fr;}.mapwrap{display:none}.main.showmap .panel{display:none}.main.showmap .mapwrap{display:block}}
+
+  /* ---------- rail ---------- */
+  nav.rail{background:var(--ink);border-right:1px solid var(--line);display:flex;flex-direction:column;
+    align-items:center;padding-top:14px;gap:6px}
+  .rail button{width:52px;height:52px;border-radius:13px;background:transparent;border:1px solid transparent;
+    color:var(--txt3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-family:var(--body);font-size:9.5px;letter-spacing:.02em}
+  .rail button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6}
+  .rail button:hover{color:var(--txt2);background:var(--ink2)}
+  .rail button.active{color:var(--lamp);background:var(--ink2);border-color:var(--line)}
+  .rail .tag{position:absolute;transform:translate(16px,-16px);font-size:8px;background:var(--lamp);color:#1a1306;
+    padding:0 4px;border-radius:4px;font-family:var(--mono);font-weight:500}
+
+  /* ---------- panel ---------- */
+  .panel{background:var(--ink2);border-right:1px solid var(--line);overflow-y:auto;padding:22px 20px 60px}
+  .panel::-webkit-scrollbar{width:9px}.panel::-webkit-scrollbar-thumb{background:var(--ink3);border-radius:9px;border:2px solid var(--ink2)}
+  .ptitle{font-family:var(--disp);font-size:21px;font-weight:600;margin:0 0 3px}
+  .psub{color:var(--txt2);font-size:13px;line-height:1.5;margin:0 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3);margin:22px 0 9px}
+  .eyebrow:first-child{margin-top:0}
+
+  label.fld{display:block;margin:0 0 13px}
+  label.fld span{display:block;font-size:11.5px;color:var(--txt2);margin:0 0 5px;letter-spacing:.02em}
+  select,input[type=text]{width:100%;background:var(--ink);border:1px solid var(--line2);color:var(--txt);
+    padding:10px 11px;border-radius:9px;font-family:var(--body);font-size:14px;appearance:none}
+  select:focus,input:focus{outline:none;border-color:var(--lamp)}
+  .od-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+  .swapbtn{height:40px;width:40px;border-radius:9px;background:var(--ink3);border:1px solid var(--line2);
+    color:var(--txt2);cursor:pointer;font-size:16px;margin-bottom:13px}
+  .swapbtn:hover{color:var(--lamp)}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin:0 0 10px;cursor:pointer}
+  .toggle .lbl{font-size:13px}.toggle .lbl small{display:block;color:var(--txt2);font-size:11px;margin-top:2px}
+  .sw{width:38px;height:22px;border-radius:999px;background:var(--ink3);border:1px solid var(--line2);position:relative;flex:none;transition:.18s}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--txt2);transition:.18s}
+  .toggle.on .sw{background:var(--lamp);border-color:var(--lamp)}
+  .toggle.on .sw::after{transform:translateX(16px);background:#1a1306}
+
+  button.primary{width:100%;background:var(--lamp);color:#1a1306;border:none;padding:13px;border-radius:10px;
+    font-family:var(--disp);font-weight:600;font-size:15px;cursor:pointer;margin-top:6px;letter-spacing:.01em}
+  button.primary:hover{background:var(--lamp-glow)}
+  button.ghost{width:100%;background:transparent;color:var(--txt2);border:1px solid var(--line2);padding:10px;
+    border-radius:10px;font-family:var(--body);font-size:13px;cursor:pointer;margin-top:8px}
+  button.ghost:hover{color:var(--txt);border-color:var(--lamp)}
+
+  /* route cards */
+  .route{background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 11px;cursor:pointer;transition:.15s}
+  .route:hover{border-color:var(--line2)}
+  .route.sel{border-color:var(--lamp);box-shadow:0 0 0 1px var(--lamp),0 8px 24px -12px rgba(242,168,44,.5)}
+  .route .rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .route .rname{font-family:var(--disp);font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+  .swatch{width:11px;height:11px;border-radius:3px;flex:none}
+  .share{font-family:var(--mono);font-size:12px;color:var(--lamp);background:rgba(242,168,44,.12);
+    padding:2px 8px;border-radius:6px}
+  .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px 14px;font-size:12px}
+  .metrics div{display:flex;justify-content:space-between;color:var(--txt2)}
+  .metrics b{color:var(--txt);font-family:var(--mono);font-weight:500}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:6px;margin:9px 6px 0 0;font-family:var(--mono)}
+  .pill.lit{background:rgba(242,168,44,.13);color:var(--lamp-glow)}
+  .pill.dark{background:rgba(214,72,59,.13);color:#f0978c}
+  .pill.marshal{background:rgba(43,177,137,.13);color:#6fd9b4}
+
+  /* simulate / control rows */
+  .seg{background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin:0 0 9px}
+  .seg .sn{display:flex;align-items:center;justify-content:space-between;font-size:13px;margin-bottom:8px}
+  .seg .sn b{font-weight:500}
+  .seg .meta{font-family:var(--mono);font-size:10.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em}
+  input[type=range]{width:100%;accent-color:var(--lamp);margin:2px 0}
+  .congval{font-family:var(--mono);font-size:11px;color:var(--txt2);text-align:right}
+  .miniact{display:flex;gap:6px;margin-top:8px}
+  .miniact button{flex:1;background:var(--ink3);border:1px solid var(--line);color:var(--txt2);
+    padding:6px;border-radius:8px;font-size:11px;cursor:pointer;font-family:var(--body)}
+  .miniact button.act{background:var(--lamp);color:#1a1306;border-color:var(--lamp)}
+  .miniact button:hover{color:var(--txt)}.miniact button.act:hover{color:#1a1306}
+
+  .note{background:rgba(242,168,44,.08);border:1px solid rgba(242,168,44,.25);border-radius:10px;
+    padding:11px 13px;font-size:12px;line-height:1.55;color:var(--lamp-glow);margin:0 0 18px}
+  .note b{color:var(--lamp)}
+  .empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px 10px;line-height:1.6}
+
+  /* ---------- map ---------- */
+  .mapwrap{position:relative}
+  #map{position:absolute;inset:0;background:#0e1217}
+  .leaflet-container{background:#0e1217;font-family:var(--body)}
+  .legend{position:absolute;right:14px;bottom:14px;z-index:1000;background:rgba(19,23,30,.92);
+    border:1px solid var(--line2);border-radius:11px;padding:12px 13px;font-size:11.5px;backdrop-filter:blur(6px)}
+  .legend .lt{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin:0 0 7px}
+  .legend .row{display:flex;align-items:center;gap:8px;margin:5px 0;color:var(--txt2)}
+  .legend .ln{width:22px;height:0;border-top:3px solid;border-radius:3px}
+  .samplebadge{position:absolute;left:14px;top:14px;z-index:1000;background:rgba(214,72,59,.14);
+    border:1px solid rgba(214,72,59,.4);color:#f0978c;font-family:var(--mono);font-size:10.5px;
+    padding:6px 10px;border-radius:8px;letter-spacing:.04em;max-width:280px;line-height:1.5}
+  .marshal-ic{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;
+    background:var(--clear);color:#06251b;font-size:11px;font-weight:700;border:1.5px solid #0e1217}
+  .od-ic{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50% 50% 50% 4px;
+    transform:rotate(45deg);font-weight:700;font-size:13px;border:2px solid #0e1217;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+  .od-ic span{transform:rotate(-45deg)}
+  .route-pulse{stroke-dasharray:2 14;animation:dash 1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-16}}
+  @media(prefers-reduced-motion:reduce){.route-pulse{animation:none}}
+  .leaflet-routelayer path{transition:opacity .2s}
+
+  /* ---------- sign-in ---------- */
+  .gate{position:fixed;inset:0;z-index:200;background:radial-gradient(120% 90% at 50% 0%,#1b2330 0%,#0e1217 70%);
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  .gate.hide{display:none}
+  .card{width:min(440px,100%);background:var(--ink2);border:1px solid var(--line);border-radius:18px;padding:30px 28px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.7)}
+  .card .lamp-dot{margin-bottom:18px}
+  .card h1{font-family:var(--disp);font-size:25px;font-weight:600;margin:0 0 6px}
+  .card p{color:var(--txt2);font-size:13.5px;line-height:1.55;margin:0 0 22px}
+  .roles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
+  .roles button{background:var(--ink);border:1px solid var(--line2);border-radius:11px;padding:14px 6px;color:var(--txt2);
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:var(--body);font-size:12px}
+  .roles button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5}
+  .roles button.sel{border-color:var(--lamp);color:var(--lamp);background:rgba(242,168,44,.07)}
+  .mockline{font-family:var(--mono);font-size:10.5px;color:var(--txt3);margin-top:14px;text-align:center;letter-spacing:.03em}
+</style>
+</head>
+<body>
+
+<!-- ===================== SIGN IN ===================== -->
+<div class="gate" id="gate">
+  <div class="card">
+    <div class="lamp-dot"></div>
+    <h1>Wayfinder</h1>
+    <p>Find your way across Redemption City — including the quiet roads most people never use. Sign in to begin.</p>
+    <div class="eyebrow" style="margin-top:0">I am a…</div>
+    <div class="roles" id="roles">
+      <button data-role="Driver"><svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 018.4 5h7.2a2 2 0 011.9 1.5L19 11M5 11h14v5H5zM7 16v2M17 16v2"/></svg>Driver</button>
+      <button data-role="Tricycle"><svg viewBox="0 0 24 24"><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/><path d="M7 17h7l-1-9H9zM14 11h4l1 6"/></svg>Tricycle</button>
+      <button data-role="Passenger"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 21v-1a6 6 0 0112 0v1"/></svg>Passenger</button>
+    </div>
+    <label class="fld"><span>Your name</span><input type="text" id="uname" placeholder="e.g. Opeyemi" value=""></label>
+    <button class="primary" id="enterBtn">Enter Wayfinder</button>
+    <div class="mockline">Accounts are mock data · the map &amp; routing are real</div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div class="app" id="app" style="visibility:hidden">
+  <header class="bar">
+    <div class="brand"><span class="lamp-dot"></span>Wayfinder <small>· Redemption City</small></div>
+    <div class="bar-spacer"></div>
+    <div class="userchip">
+      <span class="role" id="chipRole">—</span>
+      <span id="chipName">—</span>
+      <button id="signout">Sign out</button>
+    </div>
+  </header>
+
+  <div class="main" id="mainGrid">
+    <nav class="rail" id="rail">
+      <button data-view="plan" class="active"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Plan</button>
+      <button data-view="routes"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 4 3 7-9"/><circle cx="4" cy="18" r="1.5"/><circle cx="20" cy="7" r="1.5"/></svg>Routes</button>
+      <button data-view="sim"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="7" cy="17" r="2" fill="currentColor"/></svg>Simulate</button>
+      <button data-view="control"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 6a5 5 0 015 5v3l1.5 3h-13L5 14v-3a5 5 0 015-5zM9.5 20a2.5 2.5 0 005 0"/></svg>Control</button>
+      <button data-view="data"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4M5 16v3a1 1 0 001 1h12a1 1 0 001-1v-3"/></svg>Map data</button>
+    </nav>
+
+    <section class="panel" id="panel"><!-- view content injected --></section>
+
+    <div class="mapwrap">
+      <div id="map"></div>
+      <div class="samplebadge" id="sampleBadge">SAMPLE NETWORK — illustrative roads over the real camp. Replace via “Map data”.</div>
+      <div class="legend">
+        <div class="lt">Road status</div>
+        <div class="row"><span class="ln" style="border-color:#2bb189"></span>Clear</div>
+        <div class="row"><span class="ln" style="border-color:#e9a52f"></span>Moderate</div>
+        <div class="row"><span class="ln" style="border-color:#d6483b"></span>Congested</div>
+        <div class="row"><span class="ln" style="border-color:#8a8f82;border-top-style:dashed"></span>Unlit (dark)</div>
+        <div class="row"><span class="marshal-ic" style="width:14px;height:14px;font-size:9px">M</span>Marshal post</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* =====================================================================
+   WAYFINDER — Redemption City
+   Real parts:  Leaflet map @ true camp coords, Dijkstra routing engine,
+                edge-cost model (distance × congestion × lit-preference),
+                alternative-route spreading, GeoJSON import/export.
+   Mock parts:  user accounts, the SAMPLE road graph (replace via import).
+   ===================================================================== */
+
+const CAMP = {lat:6.4531, lng:3.3958};      // verified RCCG Redemption City centre
+
+/* ---------- SAMPLE GRAPH (replace via Map data → Import) ---------- */
+/* Node positions here are an illustrative layout, NOT the real road network. */
+const SAMPLE = {
+  nodes:[
+    {id:'gate1', name:'Main Gate (Expressway)', lat:6.4452, lng:3.3905},
+    {id:'plaza', name:'Junction Plaza',         lat:6.4490, lng:3.3930},
+    {id:'gate2', name:'Gate 2',                 lat:6.4470, lng:3.3985},
+    {id:'oldaud',name:'Old Auditorium',         lat:6.4515, lng:3.3950},
+    {id:'aud',   name:'Auditorium / Arena',     lat:6.4548, lng:3.3958},
+    {id:'mkt',   name:'Market Square',          lat:6.4505, lng:3.3992},
+    {id:'gate3', name:'Gate 3',                 lat:6.4522, lng:3.4022},
+    {id:'car_s', name:'South Car Park',         lat:6.4478, lng:3.3945},
+    {id:'car_n', name:'North Car Park',         lat:6.4560, lng:3.3932},
+    {id:'est_a', name:'Estate A',               lat:6.4536, lng:3.4002},
+    {id:'est_b', name:'Estate B',               lat:6.4498, lng:3.3912},
+    {id:'link1', name:'West Link',              lat:6.4522, lng:3.3914},
+    {id:'link2', name:'East Link',              lat:6.4544, lng:3.3992},
+    {id:'clinic',name:'Camp Clinic',            lat:6.4495, lng:3.3964},
+    {id:'uni',   name:'Redemption University',  lat:6.4576, lng:3.3976},
+    {id:'perim', name:'North Perimeter',        lat:6.4576, lng:3.3946}
+  ],
+  edges:[
+    /* from,to, lit, marshal, cong, name */
+    ['gate1','plaza', 1,1,0.85,'Redemption Way'],
+    ['plaza','oldaud',1,0,0.82,'Redemption Way'],
+    ['oldaud','aud',  1,0,0.90,'Arena Approach'],
+    ['plaza','car_s', 1,0,0.45,'Car Park Link'],
+    ['plaza','gate2', 1,0,0.40,'Cross Road'],
+    ['gate2','mkt',   1,0,0.35,'Market Street'],
+    ['mkt','oldaud',  1,1,0.30,'Market Link'],
+    ['mkt','clinic',  1,0,0.20,'Clinic Road'],
+    ['clinic','oldaud',1,0,0.25,'Clinic Road'],
+    ['gate1','est_b', 1,0,0.22,'West Estate Rd'],
+    ['est_b','link1', 0,0,0.10,'West Link'],
+    ['link1','car_n', 0,0,0.10,'West Link'],
+    ['link1','oldaud',0,1,0.10,'West Link'],
+    ['car_n','aud',   1,0,0.15,'North Approach'],
+    ['gate3','est_a', 1,0,0.30,'East Estate Rd'],
+    ['est_a','link2', 1,1,0.20,'East Link'],
+    ['link2','aud',   1,0,0.22,'East Approach'],
+    ['gate3','mkt',   1,0,0.30,'East Market Rd'],
+    ['aud','perim',   1,0,0.10,'North Perimeter'],
+    ['perim','uni',   1,0,0.05,'University Rd'],
+    ['perim','car_n', 1,0,0.10,'North Perimeter'],
+    ['car_s','clinic',1,0,0.20,'Clinic South'],
+    ['est_b','car_s', 1,0,0.20,'South Loop']
+  ]
+};
+
+/* ---------- graph state ---------- */
+let G = null;        // {nodes, edges, nodeById, adj}
+const ROUTE_COLORS = ['#f2a82c','#5b8def','#b07ad6'];
+
+function buildGraph(raw){
+  const nodes = raw.nodes.map(n=>({...n}));
+  const nodeById = {}; nodes.forEach(n=>nodeById[n.id]=n);
+  const edges = raw.edges.map((e,i)=>{
+    const o = Array.isArray(e)
+      ? {from:e[0],to:e[1],lit:!!e[2],marshal:!!e[3],congestion:+e[4]||0,name:e[5]||'Road',oneway:false}
+      : {oneway:false,lit:true,marshal:false,congestion:0,name:'Road',...e};
+    o.id = 'e'+i;
+    const a=nodeById[o.from], b=nodeById[o.to];
+    o.length = (a&&b)? haversine(a,b) : 0;
+    o.baseCong = o.congestion;          // remember sim baseline
+    return o;
+  }).filter(e=>e.length>0);
+  const adj={}; nodes.forEach(n=>adj[n.id]=[]);
+  edges.forEach(e=>{
+    adj[e.from].push({to:e.to,edge:e});
+    if(!e.oneway) adj[e.to].push({to:e.from,edge:e});
+  });
+  return {nodes,edges,nodeById,adj};
+}
+function haversine(a,b){
+  const R=6371000,toR=Math.PI/180;
+  const dLat=(b.lat-a.lat)*toR, dLng=(b.lng-a.lng)*toR;
+  const la1=a.lat*toR, la2=b.lat*toR;
+  const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+/* ---------- cost model + Dijkstra ---------- */
+function edgeCost(e,prefs,penalty){
+  let c = e.length;                         // metres (∝ travel time at fixed speed)
+  c *= (1 + 1.6*e.congestion);              // congestion penalty
+  if(prefs.preferLit && !e.lit) c *= 2.4;   // avoid dark roads when safety on
+  if(prefs.preferLit && e.marshal) c *= 0.90; // gentle pull toward patrolled roads
+  return c * (penalty||1);
+}
+function dijkstra(src,dst,prefs,penalties){
+  const dist={}, prev={}, prevEdge={}, done={};
+  G.nodes.forEach(n=>dist[n.id]=Infinity);
+  dist[src]=0;
+  const Q=new Set(G.nodes.map(n=>n.id));
+  while(Q.size){
+    let u=null,best=Infinity;
+    for(const id of Q){ if(dist[id]<best){best=dist[id];u=id;} }
+    if(u===null) break;
+    Q.delete(u); done[u]=1;
+    if(u===dst) break;
+    for(const {to,edge} of G.adj[u]){
+      if(done[to]) continue;
+      const nd = dist[u] + edgeCost(edge,prefs,penalties&&penalties[edge.id]);
+      if(nd<dist[to]){ dist[to]=nd; prev[to]=u; prevEdge[to]=edge; }
+    }
+  }
+  if(dist[dst]===Infinity) return null;
+  const path=[dst], eids=[]; let cur=dst;
+  while(cur!==src){ const p=prev[cur]; eids.unshift(prevEdge[cur]); path.unshift(p); cur=p; }
+  return {nodes:path, edges:eids, cost:dist[dst]};
+}
+/* up to k diverse routes via used-edge penalisation → demonstrates spreading */
+function kRoutes(src,dst,prefs,k=3){
+  if(src===dst) return [];
+  const pen={}, out=[];
+  for(let i=0;i<k+2 && out.length<k;i++){
+    const r=dijkstra(src,dst,prefs,pen);
+    if(!r) break;
+    const sig=r.edges.map(e=>e.id).join('-');
+    if(out.some(o=>o.sig===sig)){ break; }
+    r.sig=sig; out.push(r);
+    r.edges.forEach(e=> pen[e.id]=(pen[e.id]||1)*1.8 );
+  }
+  return out.map(r=>({...r, stats:routeStats(r)}));
+}
+function routeStats(r){
+  let len=0, litLen=0, marshal=false, congW=0;
+  r.edges.forEach(e=>{ len+=e.length; if(e.lit)litLen+=e.length; if(e.marshal)marshal=true; congW+=e.congestion*e.length; });
+  const speed = SPEED[session.role]||14;            // km/h
+  const minutes = (len/1000)/speed*60;
+  return {
+    metres:len, minutes,
+    litPct: len? Math.round(litLen/len*100):0,
+    marshal, avgCong: len? congW/len:0
+  };
+}
+const SPEED = {Driver:18, Tricycle:15, Passenger:4.8};
+
+/* ---------- session + prefs ---------- */
+let session = {role:null, name:''};
+let prefs = {preferLit:true};
+let origin='gate1', destination='aud';
+let routes=[], selRoute=0;
+
+/* =====================================================================
+   MAP
+   ===================================================================== */
+let map, edgeLayer, marshalLayer, nodeLayer, routeLayer, odLayer;
+let mapPickMode=false;
+
+function initMap(){
+  map = L.map('map',{zoomControl:true,attributionControl:true}).setView([CAMP.lat,CAMP.lng],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, attribution:'© OpenStreetMap'
+  }).addTo(map);
+  edgeLayer=L.layerGroup().addTo(map);
+  marshalLayer=L.layerGroup().addTo(map);
+  routeLayer=L.layerGroup().addTo(map);
+  nodeLayer=L.layerGroup().addTo(map);
+  odLayer=L.layerGroup().addTo(map);
+  drawNetwork();
+  fitToGraph();
+}
+function congColor(c){ return c<0.34?'#2bb189': c<0.66?'#e9a52f':'#d6483b'; }
+function fitToGraph(){
+  if(!G.nodes.length) return;
+  const b=L.latLngBounds(G.nodes.map(n=>[n.lat,n.lng])); map.fitBounds(b.pad(0.15));
+}
+function drawNetwork(){
+  edgeLayer.clearLayers(); marshalLayer.clearLayers(); nodeLayer.clearLayers();
+  G.edges.forEach(e=>{
+    const a=G.nodeById[e.from], b=G.nodeById[e.to];
+    L.polyline([[a.lat,a.lng],[b.lat,b.lng]],{
+      color:congColor(e.congestion), weight:e.lit?5:4, opacity:.9,
+      dashArray:e.lit?null:'4 9', lineCap:'round'
+    }).bindTooltip(`${e.name} · ${(e.length).toFixed(0)} m${e.lit?'':' · unlit'}${e.marshal?' · marshal':''}`).addTo(edgeLayer);
+    if(e.marshal){
+      const mid=[(a.lat+b.lat)/2,(a.lng+b.lng)/2];
+      L.marker(mid,{icon:L.divIcon({className:'',html:'<div class="marshal-ic">M</div>',iconSize:[18,18]})}).addTo(marshalLayer);
+    }
+  });
+  G.nodes.forEach(n=>{
+    const m=L.circleMarker([n.lat,n.lng],{radius:5,color:'#0e1217',weight:2,fillColor:'#cdd2c6',fillOpacity:1})
+      .bindTooltip(n.name,{direction:'top'}).addTo(nodeLayer);
+    m.on('click',()=>onNodePick(n.id));
+  });
+}
+function onNodePick(id){
+  if(!mapPickMode) return;
+  if(!pickFirst){ pickFirst=id; origin=id; syncODSelects(); flashPick(id); }
+  else { destination=id; pickFirst=null; mapPickMode=false; syncODSelects(); renderView(); }
+  drawOD();
+}
+let pickFirst=null;
+function flashPick(id){ drawOD(); }
+function drawOD(){
+  odLayer.clearLayers();
+  const o=G.nodeById[origin], d=G.nodeById[destination];
+  if(o) odLayer.addLayer(L.marker([o.lat,o.lng],{icon:odIcon('A','#f2a82c'),zIndexOffset:1000}));
+  if(d) odLayer.addLayer(L.marker([d.lat,d.lng],{icon:odIcon('B','#2bb189'),zIndexOffset:1000}));
+}
+function odIcon(t,c){
+  return L.divIcon({className:'',iconSize:[26,26],iconAnchor:[13,24],
+    html:`<div class="od-ic" style="background:${c}"><span>${t}</span></div>`});
+}
+function drawRoutes(){
+  routeLayer.clearLayers();
+  routes.forEach((r,i)=>{
+    const sel = i===selRoute;
+    const latlngs = r.nodes.map(id=>{const n=G.nodeById[id];return [n.lat,n.lng];});
+    L.polyline(latlngs,{color:ROUTE_COLORS[i%3],weight:sel?9:4,opacity:sel?.95:.45,lineCap:'round'}).addTo(routeLayer);
+    if(sel){
+      L.polyline(latlngs,{color:'#fff',weight:3,opacity:.9,lineCap:'round',className:'route-pulse'}).addTo(routeLayer);
+    }
+  });
+  drawOD();
+}
+
+/* =====================================================================
+   VIEWS
+   ===================================================================== */
+let view='plan';
+const panel=()=>document.getElementById('panel');
+
+function renderView(){
+  document.querySelectorAll('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  ({plan:vPlan, routes:vRoutes, sim:vSim, control:vControl, data:vData})[view]();
+}
+
+function optList(sel){ return G.nodes.map(n=>`<option value="${n.id}" ${n.id===sel?'selected':''}>${n.name}</option>`).join(''); }
+
+function vPlan(){
+  panel().innerHTML = `
+    <h2 class="ptitle">Plan a route</h2>
+    <p class="psub">Pick where you’re starting and where you’re headed. Wayfinder shows every viable road — not just the one everyone follows.</p>
+    <div class="eyebrow">Trip</div>
+    <div class="od-row">
+      <label class="fld"><span>From</span><select id="selFrom">${optList(origin)}</select></label>
+    </div>
+    <button class="swapbtn" id="swap" title="Swap" style="margin:-4px 0 9px">⇅</button>
+    <label class="fld"><span>To</span><select id="selTo">${optList(destination)}</select></label>
+    <button class="ghost" id="pickOnMap">${mapPickMode?'Tap two points on the map…':'Or pick points on the map'}</button>
+    <div class="eyebrow">Preferences</div>
+    <div class="toggle ${prefs.preferLit?'on':''}" id="tgLit">
+      <div class="lbl">Prefer well-lit roads<small>Avoid dark segments; favour patrolled routes</small></div>
+      <div class="sw"></div>
+    </div>
+    <button class="primary" id="findBtn">Find routes</button>
+  `;
+  document.getElementById('selFrom').onchange=e=>{origin=e.target.value;drawOD();};
+  document.getElementById('selTo').onchange=e=>{destination=e.target.value;drawOD();};
+  document.getElementById('swap').onclick=()=>{[origin,destination]=[destination,origin];syncODSelects();drawOD();};
+  document.getElementById('tgLit').onclick=()=>{prefs.preferLit=!prefs.preferLit;vPlan();};
+  document.getElementById('pickOnMap').onclick=()=>{mapPickMode=true;pickFirst=null;vPlan();};
+  document.getElementById('findBtn').onclick=()=>{computeRoutes();view='routes';renderView();};
+  drawOD();
+}
+function syncODSelects(){
+  const f=document.getElementById('selFrom'), t=document.getElementById('selTo');
+  if(f)f.value=origin; if(t)t.value=destination;
+}
+function computeRoutes(){
+  routes=kRoutes(origin,destination,prefs,3); selRoute=0; drawRoutes();
+}
+
+function vRoutes(){
+  if(!routes.length){
+    panel().innerHTML=`<h2 class="ptitle">Routes</h2><div class="empty">No routes yet.<br>Head to <b style="color:var(--lamp)">Plan</b> and choose a trip.</div>`;
+    return;
+  }
+  // spreading: weight inversely by cost → suggested distribution of traffic
+  const inv=routes.map(r=>1/r.cost), tot=inv.reduce((a,b)=>a+b,0);
+  const shares=inv.map(x=>Math.round(x/tot*100));
+  const o=G.nodeById[origin].name, d=G.nodeById[destination].name;
+  let html=`<h2 class="ptitle">Routes</h2>
+    <p class="psub"><b style="color:var(--txt)">${o}</b> → <b style="color:var(--txt)">${d}</b> · ${session.role} · ${prefs.preferLit?'lit-preferred':'shortest'}</p>
+    <div class="note">To stop everyone piling onto one road, Wayfinder recommends <b>spreading</b> traffic across the alternatives below — the share shows how many to send each way.</div>`;
+  routes.forEach((r,i)=>{
+    const s=r.stats;
+    html+=`<div class="route ${i===selRoute?'sel':''}" data-i="${i}">
+      <div class="rh">
+        <div class="rname"><span class="swatch" style="background:${ROUTE_COLORS[i%3]}"></span>${i===0?'Recommended':'Alternative '+i}</div>
+        <div class="share">${shares[i]}% of traffic</div>
+      </div>
+      <div class="metrics">
+        <div>Distance<b>${(s.metres/1000).toFixed(2)} km</b></div>
+        <div>Time<b>${Math.round(s.minutes)} min</b></div>
+        <div>Lit<b>${s.litPct}%</b></div>
+        <div>Congestion<b>${s.avgCong<0.34?'Clear':s.avgCong<0.66?'Moderate':'Heavy'}</b></div>
+      </div>
+      ${s.litPct===100?'<span class="pill lit">fully lit</span>':`<span class="pill dark">${100-s.litPct}% unlit</span>`}
+      ${s.marshal?'<span class="pill marshal">marshal post</span>':''}
+    </div>`;
+  });
+  panel().innerHTML=html;
+  panel().querySelectorAll('.route').forEach(el=>el.onclick=()=>{selRoute=+el.dataset.i;drawRoutes();vRoutes();});
+  drawRoutes();
+}
+
+function vSim(){
+  let html=`<h2 class="ptitle">Simulate congestion</h2>
+    <p class="psub">Set how busy each road is and watch routing adapt. This stands in for the live feed (marshal taps / GPS) you’ll wire up later.</p>
+    <button class="ghost" id="surge" style="margin-bottom:6px">⚡ Simulate Holy Ghost Service surge</button>
+    <button class="ghost" id="resetCong">Reset to baseline</button>
+    <div class="eyebrow">Roads</div>`;
+  G.edges.forEach(e=>{
+    html+=`<div class="seg">
+      <div class="sn"><b>${e.name}</b><span class="meta">${G.nodeById[e.from].name.split(' ')[0]}–${G.nodeById[e.to].name.split(' ')[0]}</span></div>
+      <input type="range" min="0" max="100" value="${Math.round(e.congestion*100)}" data-e="${e.id}">
+      <div class="congval">${e.congestion<0.34?'Clear':e.congestion<0.66?'Moderate':'Heavy'} · ${Math.round(e.congestion*100)}%</div>
+    </div>`;
+  });
+  panel().innerHTML=html;
+  panel().querySelectorAll('input[type=range]').forEach(sl=>{
+    sl.oninput=()=>{
+      const e=G.edges.find(x=>x.id===sl.dataset.e); e.congestion=+sl.value/100;
+      sl.nextElementSibling.textContent=`${e.congestion<0.34?'Clear':e.congestion<0.66?'Moderate':'Heavy'} · ${sl.value}%`;
+      drawNetwork(); if(routes.length){computeRoutes();}
+    };
+  });
+  document.getElementById('surge').onclick=()=>{
+    const heavy=['Redemption Way','Arena Approach','Car Park Link'];
+    G.edges.forEach(e=> e.congestion = heavy.includes(e.name)? 0.9 : e.congestion);
+    drawNetwork(); if(routes.length)computeRoutes(); vSim();
+  };
+  document.getElementById('resetCong').onclick=()=>{
+    G.edges.forEach(e=>e.congestion=e.baseCong); drawNetwork(); if(routes.length)computeRoutes(); vSim();
+  };
+}
+
+function vControl(){
+  const dark=G.edges.filter(e=>!e.lit);
+  let html=`<h2 class="ptitle">Control center</h2>
+    <p class="psub">The operations view. Turn an underused dark road into a trusted one — add lighting or a marshal — and routing will start sending people through it.</p>
+    <div class="eyebrow">Dark spots (${dark.length})</div>`;
+  if(!dark.length) html+=`<div class="empty">No unlit roads remain. Every route is lit.</div>`;
+  dark.forEach(e=>{
+    html+=`<div class="seg">
+      <div class="sn"><b>${e.name}</b><span class="meta">${G.nodeById[e.from].name.split(' ')[0]}–${G.nodeById[e.to].name.split(' ')[0]}</span></div>
+      <div class="miniact">
+        <button data-light="${e.id}">💡 Add lighting</button>
+        <button data-marshal="${e.id}" class="${e.marshal?'act':''}">🛡 ${e.marshal?'Marshal on':'Add marshal'}</button>
+      </div>
+    </div>`;
+  });
+  html+=`<div class="eyebrow">All roads with a marshal</div>`;
+  const withM=G.edges.filter(e=>e.marshal);
+  if(!withM.length) html+=`<div class="empty" style="padding:16px">None yet.</div>`;
+  withM.forEach(e=> html+=`<div class="seg" style="padding:10px 13px"><div class="sn" style="margin:0"><b>${e.name}</b><span class="pill marshal" style="margin:0">marshal</span></div></div>`);
+  panel().innerHTML=html;
+  panel().querySelectorAll('[data-light]').forEach(b=>b.onclick=()=>{
+    const e=G.edges.find(x=>x.id===b.dataset.light); e.lit=true;
+    drawNetwork(); if(routes.length)computeRoutes(); vControl();
+  });
+  panel().querySelectorAll('[data-marshal]').forEach(b=>b.onclick=()=>{
+    const e=G.edges.find(x=>x.id===b.dataset.marshal); e.marshal=!e.marshal;
+    drawNetwork(); if(routes.length)computeRoutes(); vControl();
+  });
+}
+
+function vData(){
+  panel().innerHTML=`
+    <h2 class="ptitle">Map data</h2>
+    <p class="psub">The map &amp; routing are real; the road graph is sample data. Digitize the true camp roads (OpenStreetMap / satellite + field check), then import here — no code changes needed.</p>
+    <div class="note"><b>Format:</b> a GeoJSON <i>FeatureCollection</i> of <b>LineString</b> features. Each road’s <b>properties</b> may include <code>name</code>, <code>lit</code> (true/false), <code>marshal</code> (true/false), <code>congestion</code> (0–1), <code>oneway</code> (true/false). Endpoints that meet are joined into junctions automatically.</div>
+    <div class="eyebrow">Import</div>
+    <input type="text" id="fileproxy" style="display:none">
+    <button class="primary" id="importBtn">Import GeoJSON…</button>
+    <input type="file" id="fileInput" accept=".json,.geojson,application/json" style="display:none">
+    <div id="importMsg" class="psub" style="margin-top:12px"></div>
+    <div class="eyebrow">Export</div>
+    <button class="ghost" id="exportBtn">Download current graph as GeoJSON</button>
+    <button class="ghost" id="restoreBtn">Restore sample network</button>
+  `;
+  document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();
+  document.getElementById('fileInput').onchange=onImport;
+  document.getElementById('exportBtn').onclick=exportGeoJSON;
+  document.getElementById('restoreBtn').onclick=()=>{loadGraph(SAMPLE,true);document.getElementById('importMsg').innerHTML='Sample network restored.';};
+}
+
+/* ---------- GeoJSON import / export ---------- */
+function loadGraph(raw, isSample){
+  G=buildGraph(raw);
+  origin=G.nodes[0]?.id; destination=G.nodes[G.nodes.length-1]?.id;
+  routes=[]; selRoute=0;
+  document.getElementById('sampleBadge').style.display = isSample? 'block':'none';
+  if(map){ drawNetwork(); fitToGraph(); drawOD(); routeLayer.clearLayers(); }
+}
+function onImport(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const gj=JSON.parse(rd.result);
+      const raw=geojsonToGraph(gj);
+      if(!raw.edges.length) throw new Error('No LineString features found.');
+      loadGraph(raw,false);
+      view='plan'; renderView();
+      document.getElementById('panel') && (view='data',renderView());
+      const msg=document.getElementById('importMsg');
+      if(msg) msg.innerHTML=`Imported <b style="color:var(--lamp)">${raw.nodes.length}</b> junctions and <b style="color:var(--lamp)">${raw.edges.length}</b> road segments. Open <b>Plan</b> to route on real data.`;
+    }catch(err){
+      const msg=document.getElementById('importMsg');
+      if(msg) msg.innerHTML=`<span style="color:#f0978c">Could not import: ${err.message}</span>`;
+    }
+  };
+  rd.readAsText(f);
+  ev.target.value='';
+}
+function geojsonToGraph(gj){
+  const feats = gj.type==='FeatureCollection' ? gj.features : (gj.type==='Feature'? [gj] : []);
+  const nodes=[], idx={}; const key=(lng,lat)=>lng.toFixed(5)+','+lat.toFixed(5);
+  function nodeAt(lng,lat){
+    const k=key(lng,lat);
+    if(idx[k]!=null) return nodes[idx[k]].id;
+    const id='n'+nodes.length;
+    idx[k]=nodes.length; nodes.push({id,name:'Junction '+(nodes.length+1),lat,lng});
+    return id;
+  }
+  const edges=[];
+  feats.forEach(ft=>{
+    if(!ft.geometry || ft.geometry.type!=='LineString') return;
+    const co=ft.geometry.coordinates; if(co.length<2) return;
+    const p=ft.properties||{};
+    const a=nodeAt(co[0][0],co[0][1]);
+    const b=nodeAt(co[co.length-1][0],co[co.length-1][1]);
+    if(a===b) return;
+    edges.push({from:a,to:b,
+      name:p.name||p.NAME||'Road',
+      lit: p.lit!==undefined? !!p.lit : (p.lighting!==undefined?!!p.lighting:true),
+      marshal: !!p.marshal,
+      congestion: p.congestion!==undefined? Math.max(0,Math.min(1,+p.congestion)):0,
+      oneway: !!p.oneway});
+  });
+  // name endpoint junctions after a touching road, for readability
+  return {nodes,edges};
+}
+function exportGeoJSON(){
+  const feats=G.edges.map(e=>{
+    const a=G.nodeById[e.from], b=G.nodeById[e.to];
+    return {type:'Feature',
+      properties:{name:e.name,lit:e.lit,marshal:e.marshal,congestion:+e.congestion.toFixed(2),oneway:e.oneway,
+                  from:e.from,to:e.to,length_m:Math.round(e.length)},
+      geometry:{type:'LineString',coordinates:[[a.lng,a.lat],[b.lng,b.lat]]}};
+  });
+  const fc={type:'FeatureCollection',features:feats};
+  const blob=new Blob([JSON.stringify(fc,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='camp-roads.geojson'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* =====================================================================
+   SIGN-IN + BOOT
+   ===================================================================== */
+let pendingRole=null;
+document.querySelectorAll('#roles button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#roles button').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel'); pendingRole=b.dataset.role;
+  };
+});
+document.getElementById('enterBtn').onclick=()=>{
+  const name=document.getElementById('uname').value.trim()||'Guest';
+  session.role = pendingRole||'Passenger';
+  session.name = name;
+  document.getElementById('chipRole').textContent=session.role;
+  document.getElementById('chipName').textContent=session.name;
+  document.getElementById('gate').classList.add('hide');
+  const app=document.getElementById('app'); app.style.visibility='visible';
+  if(!map){
+    if(typeof L==='undefined'){ alert('Map library failed to load (network). The app needs internet for map tiles.'); }
+    loadGraph(SAMPLE,true);
+    initMap();
+  }
+  view='plan'; renderView();
+};
+document.getElementById('signout').onclick=()=>{
+  document.getElementById('app').style.visibility='hidden';
+  document.getElementById('gate').classList.remove('hide');
+};
+document.querySelectorAll('.rail button').forEach(b=>{
+  b.onclick=()=>{ view=b.dataset.view; mapPickMode=false; renderView(); };
+});
+
+/* preload graph so the network is ready immediately on enter */
+G=buildGraph(SAMPLE);
+</script>
+</body>
+</html>
